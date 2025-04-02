@@ -2,22 +2,20 @@
 
 import { useState } from 'react';
 import { 
-  Plus, 
-  Calendar, 
-  Users, 
-  Clock, 
-  AlertCircle,
-  Search,
-  Filter,
-  Building2,
-  Mail,
-  Phone,
-  ArrowRight,
-  CheckCircle2,
-  CircleDot,
-  Circle,
-  Clock as ClockIcon
-} from 'lucide-react';
+  FaPlus, 
+  FaCalendarAlt, 
+  FaUsers, 
+  FaClock, 
+  FaExclamationCircle,
+  FaSearch,
+  FaFilter,
+  FaBuilding,
+  FaEnvelope,
+  FaPhone,
+  FaArrowRight,
+  FaCheckCircle,
+  FaCircle,
+} from 'react-icons/fa';
 import Link from 'next/link';
 import { Project } from '@/src/types/project';
 
@@ -90,13 +88,13 @@ export default function ProjectsPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CircleDot className="w-4 h-4" />;
+        return <FaCircle className="w-4 h-4" />;
       case 'completed':
-        return <CheckCircle2 className="w-4 h-4" />;
+        return <FaCheckCircle className="w-4 h-4" />;
       case 'on-hold':
-        return <Clock className="w-4 h-4" />;
+        return <FaClock className="w-4 h-4" />;
       default:
-        return <Circle className="w-4 h-4" />;
+        return <FaCircle className="w-4 h-4" />;
     }
   };
 
@@ -109,7 +107,7 @@ export default function ProjectsPage() {
           <p className="text-gray-600 mt-1">Manage and track your projects</p>
         </div>
         <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-          <Plus className="w-5 h-5 mr-2" />
+          <FaPlus className="w-5 h-5 mr-2" />
           New Project
         </button>
       </div>
@@ -117,7 +115,7 @@ export default function ProjectsPage() {
       {/* Search and Filter Section */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
             placeholder="Search projects..."
@@ -127,7 +125,7 @@ export default function ProjectsPage() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-gray-400" />
+          <FaFilter className="w-5 h-5 text-gray-400" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -169,17 +167,17 @@ export default function ProjectsPage() {
 
                 {/* Client Info */}
                 <div className="space-y-2.5 bg-gray-50 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Building2 className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm font-medium">{project.clientName}</span>
+                  <div className="flex items-center gap-2">
+                    <FaBuilding className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm text-gray-600">{project.clientName}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Mail className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm truncate">{project.clientEmail}</span>
+                  <div className="flex items-center gap-2">
+                    <FaEnvelope className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm text-gray-600">{project.clientEmail}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Phone className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm">{project.clientPhone}</span>
+                  <div className="flex items-center gap-2">
+                    <FaPhone className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm text-gray-600">{project.clientPhone}</span>
                   </div>
                 </div>
 
@@ -189,13 +187,13 @@ export default function ProjectsPage() {
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 bg-blue-50 rounded-lg">
-                          <Users className="w-4 h-4 text-blue-600" />
+                          <FaUsers className="w-5 h-5 text-blue-600" />
                         </div>
                         <span className="text-sm font-medium text-gray-700">{project.members.length} members</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 bg-green-50 rounded-lg">
-                          <ClockIcon className="w-4 h-4 text-green-600" />
+                          <FaClock className="w-5 h-5 text-green-600" />
                         </div>
                         <span className="text-sm font-medium text-gray-700">
                           {project.tasks.completed}/{project.tasks.total} tasks
@@ -204,7 +202,7 @@ export default function ProjectsPage() {
                     </div>
                     <div className="flex items-center gap-2 text-blue-600 group-hover:gap-3 transition-all">
                       <span className="text-sm font-medium">View Details</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <FaArrowRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </div>
@@ -213,17 +211,13 @@ export default function ProjectsPage() {
               {/* Project Timeline */}
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
                 <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <div className="p-1 bg-purple-50 rounded-lg">
-                      <Calendar className="w-4 h-4 text-purple-600" />
-                    </div>
-                    <span>Start: {project.startDate.toLocaleDateString()}</span>
+                  <div className="flex items-center gap-2">
+                    <FaCalendarAlt className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm text-gray-600">Start: {project.startDate.toLocaleDateString()}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <div className="p-1 bg-orange-50 rounded-lg">
-                      <Clock className="w-4 h-4 text-orange-600" />
-                    </div>
-                    <span>End: {project.endDate.toLocaleDateString()}</span>
+                  <div className="flex items-center gap-2">
+                    <FaClock className="w-5 h-5 text-gray-600" />
+                    <span className="text-sm text-gray-600">End: {project.endDate.toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
@@ -236,7 +230,7 @@ export default function ProjectsPage() {
       {filteredProjects.length === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-400 mb-4">
-            <AlertCircle className="w-12 h-12 mx-auto" />
+            <FaExclamationCircle className="w-12 h-12 mx-auto" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No projects found</h3>
           <p className="text-gray-600">Try adjusting your search or filter criteria</p>
