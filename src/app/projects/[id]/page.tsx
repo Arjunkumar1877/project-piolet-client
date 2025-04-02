@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Plus, 
   Calendar, 
@@ -25,7 +25,6 @@ import {
   Filter,
 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -66,9 +65,6 @@ interface Task {
   updatedAt: Date;
 }
 
-interface ProjectQuery {
-  id?: string;
-}
 
 // Mock projects data
 const mockProjects: Project[] = [
@@ -277,13 +273,6 @@ const mockTasks: Record<string, Task[]> = {
   ]
 };
 
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(date);
-};
 
 export default function ProjectDetailsPage() {
   
@@ -292,7 +281,6 @@ export default function ProjectDetailsPage() {
   const [showAddMember, setShowAddMember] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [isLoading, setIsLoading] = useState(true);
   
   const project = mockProjects.find((p: Project) => p.id === id);
   const tasks = mockTasks[id as string] || [];
