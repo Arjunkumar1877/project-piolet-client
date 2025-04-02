@@ -2,28 +2,25 @@
 
 import { useState } from 'react';
 import { 
-  Plus, 
-  Calendar, 
-  Clock, 
-  AlertCircle, 
-  Building2,
-  Mail,
-  Phone,
-  MapPin,
-  ArrowLeft,
-  User,
-  Flag,
-  Calendar as CalendarIcon,
-  Clock as ClockIcon,
-  CheckCircle,
-  CircleDot,
-  Circle,
-  Users,
-  UserPlus,
-  X,
-  Search,
-  Filter,
-} from 'lucide-react';
+  FaPlus, 
+  FaCalendarAlt, 
+  FaClock, 
+  FaExclamationCircle, 
+  FaBuilding,
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaArrowLeft,
+  FaUser,
+  FaFlag,
+  FaCheckCircle,
+  FaCircle,
+  FaUsers,
+  FaUserPlus,
+  FaTimes,
+  FaSearch,
+  FaFilter,
+} from 'react-icons/fa';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -336,13 +333,13 @@ export default function ProjectDetailsPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-4 h-4" />;
+        return <FaCheckCircle className="w-4 h-4" />;
       case 'in-progress':
-        return <CircleDot className="w-4 h-4" />;
+        return <FaCircle className="w-4 h-4" />;
       case 'todo':
-        return <Circle className="w-4 h-4" />;
+        return <FaCircle className="w-4 h-4" />;
       default:
-        return <Circle className="w-4 h-4" />;
+        return <FaCircle className="w-4 h-4" />;
     }
   };
 
@@ -369,7 +366,7 @@ export default function ProjectDetailsPage() {
           href="/projects" 
           className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6 group transition-colors"
         >
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+          <FaArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Back to Projects
         </Link>
 
@@ -390,14 +387,14 @@ export default function ProjectDetailsPage() {
                 onClick={() => setShowAddMember(true)}
                 className="flex items-center px-4 py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-200 border border-gray-200 hover:border-gray-300"
               >
-                <UserPlus className="w-5 h-5 mr-2" />
+                <FaUserPlus className="w-5 h-5 mr-2" />
                 Add Member
               </button>
               <button 
                 onClick={() => setShowAddTask(true)}
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                <Plus className="w-5 h-5 mr-2" />
+                <FaPlus className="w-5 h-5 mr-2" />
                 Add Task
               </button>
             </div>
@@ -406,7 +403,7 @@ export default function ProjectDetailsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
             <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
               <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Building2 className="w-5 h-5 text-gray-600" />
+                <FaBuilding className="w-5 h-5 text-gray-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Client</p>
@@ -415,7 +412,7 @@ export default function ProjectDetailsPage() {
             </div>
             <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
               <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Mail className="w-5 h-5 text-gray-600" />
+                <FaEnvelope className="w-5 h-5 text-gray-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Email</p>
@@ -424,7 +421,7 @@ export default function ProjectDetailsPage() {
             </div>
             <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
               <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Phone className="w-5 h-5 text-gray-600" />
+                <FaPhone className="w-5 h-5 text-gray-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Phone</p>
@@ -433,7 +430,7 @@ export default function ProjectDetailsPage() {
             </div>
             <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
               <div className="p-2 bg-white rounded-lg shadow-sm">
-                <MapPin className="w-5 h-5 text-gray-600" />
+                <FaMapMarkerAlt className="w-5 h-5 text-gray-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Address</p>
@@ -444,14 +441,14 @@ export default function ProjectDetailsPage() {
 
           <div className="flex items-center gap-8 mt-8 text-sm">
             <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <Calendar className="w-5 h-5 text-gray-600" />
+              <FaCalendarAlt className="w-5 h-5 text-gray-600" />
               <div>
                 <p className="text-gray-500">Start Date</p>
                 <p className="font-medium text-gray-900">1234567</p>
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <Clock className="w-5 h-5 text-gray-600" />
+              <FaClock className="w-5 h-5 text-gray-600" />
               <div>
                 <p className="text-gray-500">End Date</p>
                 <p className="font-medium text-gray-900">1234567</p>
@@ -464,7 +461,7 @@ export default function ProjectDetailsPage() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-50 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600" />
+                <FaUsers className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Team Members</h2>
@@ -499,7 +496,7 @@ export default function ProjectDetailsPage() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-50 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <FaCheckCircle className="w-5 h-5 text-green-600" />
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
@@ -512,7 +509,7 @@ export default function ProjectDetailsPage() {
 
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search tasks..."
@@ -522,7 +519,7 @@ export default function ProjectDetailsPage() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-gray-400" />
+              <FaFilter className="w-5 h-5 text-gray-400" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -557,21 +554,21 @@ export default function ProjectDetailsPage() {
                     <p className="text-gray-600 mt-2">{task.description}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Flag className={`w-5 h-5 ${getPriorityColor(task.priority)}`} />
+                    <FaFlag className={`w-5 h-5 ${getPriorityColor(task.priority)}`} />
                   </div>
                 </div>
 
                 <div className="flex items-center gap-6 mt-4 text-sm text-gray-500">
                   <div className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
+                    <FaUser className="w-4 h-4" />
                     <span>{task.assignedTo}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CalendarIcon className="w-4 h-4" />
+                    <FaCalendarAlt className="w-4 h-4" />
                     <span>Due: 1234567</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <ClockIcon className="w-4 h-4" />
+                    <FaClock className="w-4 h-4" />
                     <span>Updated: 1234567</span>
                   </div>
                 </div>
@@ -582,7 +579,7 @@ export default function ProjectDetailsPage() {
           {filteredTasks.length === 0 && (
             <div className="text-center py-12">
               <div className="text-gray-400 mb-4">
-                <AlertCircle className="w-12 h-12 mx-auto" />
+                <FaExclamationCircle className="w-12 h-12 mx-auto" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
               <p className="text-gray-600">Add a new task to get started</p>
@@ -611,7 +608,7 @@ export default function ProjectDetailsPage() {
                   onClick={() => setShowAddMember(false)}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <FaTimes className="w-5 h-5" />
                 </button>
               </div>
               <form onSubmit={handleAddMember} className="space-y-4">
@@ -683,7 +680,7 @@ export default function ProjectDetailsPage() {
                   onClick={() => setShowAddTask(false)}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <FaTimes className="w-5 h-5" />
                 </button>
               </div>
               <form onSubmit={handleAddTask} className="space-y-4">
