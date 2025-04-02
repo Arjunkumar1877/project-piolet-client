@@ -9,11 +9,9 @@ import {
   AlertCircle,
   Search,
   Filter,
-  ChevronDown,
   Building2,
   Mail,
   Phone,
-  MapPin,
   ArrowRight,
   CheckCircle2,
   CircleDot,
@@ -21,11 +19,10 @@ import {
   Clock as ClockIcon
 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Project } from '@/src/types/project';
 
 
-export const mockProjects: Project[] = [
+const mockProjects: Project[] = [
 {
   id: '1',
   projectName: 'E-commerce Website Development',
