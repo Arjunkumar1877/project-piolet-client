@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import { useLogin } from '@/src/api/mutations'
 import { useState } from 'react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import { useRouter } from 'next/navigation'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -21,7 +22,7 @@ export default function LoginPage() {
   const setUser = useAuthStore((state) => state.setUser)
   const setAccessToken = useAuthStore((state) => state.setAccessToken)
   const [showPassword, setShowPassword] = useState<boolean>(false)
-
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -46,7 +47,7 @@ export default function LoginPage() {
      setUser(res.user)
         setAccessToken(res.accessToken)
     toast.success(res.message)
-        // router.push('/dashboard')
+        router.push('/dashboard')
   }
 
   const handleShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {

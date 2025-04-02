@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import { useSignup } from '@/src/api/mutations'
 import { useState } from 'react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import { useRouter } from 'next/navigation'
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -30,7 +31,7 @@ export default function SignupPage() {
   const setAccessToken = useAuthStore((state) => state.setAccessToken)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
-
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -61,7 +62,7 @@ export default function SignupPage() {
     setUser(res.user)
     setAccessToken(res.accessToken)
     toast.success(res.message)
-    // router.push('/dashboard')
+    router.push('/dashboard')
   }
 
   const handleShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
