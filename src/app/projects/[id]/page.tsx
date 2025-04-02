@@ -382,7 +382,7 @@ export default function ProjectDetailsPage() {
                   {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                 </span>
               </div>
-              <h1 className="text-4xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">{project.projectName}</h1>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">{project.projectName}</h1>
               <p className="text-gray-600 mt-2 text-lg">{project.description}</p>
             </div>
             <div className="flex items-center gap-3">
