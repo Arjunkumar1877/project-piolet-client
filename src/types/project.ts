@@ -13,4 +13,11 @@ export interface Project {
     total: number;
     completed: number;
   };
+  members: ProjectMember[];
 } 
+
+export interface ProjectMember {
+  name: string;
+  role: string;
+  email: string;
+}
