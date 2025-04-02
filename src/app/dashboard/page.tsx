@@ -53,7 +53,7 @@ export default function DashboardPage() {
       <div className="bg-[#121212] border-b border-[#1a1a1a]">
         <div className="px-8 py-6">
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-gray-400 mt-1">Welcome back! Here's your project overview.</p>
+          <p className="text-gray-400 mt-1">Welcome back! Here is your project overview.</p>
         </div>
       </div>
 
