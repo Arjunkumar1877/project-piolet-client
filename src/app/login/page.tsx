@@ -80,8 +80,8 @@ export default function LoginPage() {
                 type="email"
                 {...register('email')}
                 className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
-                  errors.email ? 'border-red-500' : 'border-[#1a1a1a]'
-                } bg-[#1a1a1a] text-white placeholder-gray-400 rounded-t-md focus:outline-none focus:ring-[#0f717b] focus:border-[#0f717b] focus:z-10 sm:text-sm`}
+                  errors.email ? 'border-red-500' : 'border-[#0f717b]'
+                } bg-black text-white placeholder-gray-400 rounded-t-md focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm`}
                 placeholder="Email address"
               />
               {errors.email && (
@@ -97,8 +97,8 @@ export default function LoginPage() {
                 type={showPassword ? 'text' : 'password'}
                 {...register('password')}
                 className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-500' : 'border-[#1a1a1a]'
-                } bg-[#1a1a1a] text-white placeholder-gray-400 rounded-b-md focus:outline-none focus:ring-[#0f717b] focus:border-[#0f717b] focus:z-10 sm:text-sm`}
+                  errors.password ? 'border-red-500' : 'border-[#0f717b]'
+                } bg-black text-white placeholder-gray-400 rounded-b-md focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm`}
                 placeholder="Password"
               />
               {

@@ -99,9 +99,8 @@ export default function SignupPage() {
                 id="name"
                 type="text"
                 {...register('name')}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f717b] focus:z-10 sm:text-sm rounded-t-md border-b-0"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#0f717b] bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm rounded-t-md"
                 placeholder="Full Name"
-                style={{ backgroundColor: 'white' }}
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
@@ -115,9 +114,8 @@ export default function SignupPage() {
                 id="email"
                 type="email"
                 {...register('email')}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f717b] focus:z-10 sm:text-sm border-b-0"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#0f717b] bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm"
                 placeholder="Email address"
-                style={{ backgroundColor: 'white' }}
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
@@ -131,9 +129,8 @@ export default function SignupPage() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 {...register('password')}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f717b] focus:z-10 sm:text-sm border-b-0"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#0f717b] bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm"
                 placeholder="Password"
-                style={{ backgroundColor: 'white' }}
               />
               {
                 showPassword ? (
@@ -168,9 +165,8 @@ export default function SignupPage() {
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 {...register('confirmPassword')}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f717b] focus:z-10 sm:text-sm rounded-b-md"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#0f717b] bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm rounded-b-md"
                 placeholder="Confirm Password"
-                style={{ backgroundColor: 'white' }}
               />
               {
                 showConfirmPassword ? (
