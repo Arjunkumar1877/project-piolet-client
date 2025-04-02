@@ -5,7 +5,11 @@ export function useSignup() {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: {
+        email: string,
+        password: string,
+        name: string
+    }) => {
       const res = await api.post('/auth/signup', data)
       return res.data 
     },
@@ -27,14 +31,11 @@ export function useSignup() {
 export function useLogin() {
   const mutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
-      try {
         const userCredential = await api.post('/auth/login', {
             email, password
         })
         return userCredential.data
-      } catch (error: any) {
-        throw new Error(error.message || 'Login failed')
-      }
+
     },
     onSuccess: (data) => {
       console.log('Login successful', data)

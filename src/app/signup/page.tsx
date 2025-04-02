@@ -10,6 +10,7 @@ import { useSignup } from '@/src/api/mutations'
 import { useState } from 'react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { useRouter } from 'next/navigation'
+import React from 'react'
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -23,8 +24,6 @@ const signupSchema = z.object({
 
 type SignupFormData = z.infer<typeof signupSchema>
 
-// Shared input style class
-const inputStyle = "appearance-none rounded-none relative block w-full px-3 py-2 border bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f717b] focus:z-10 sm:text-sm";
 
 export default function SignupPage() {
   const setUser = useAuthStore((state) => state.setUser)
@@ -57,6 +56,7 @@ export default function SignupPage() {
     });
 
     if(!res.user){
+        setError('root', { message: res.message })
       return toast.error(res.message)
     }
     setUser(res.user)

@@ -42,6 +42,7 @@ export default function LoginPage() {
     const res = await loginMutation.mutateAsync(data);
 
      if(!res.user){
+        setError('root', { message: res.message })
       return toast.error(res.message)
      }
      setUser(res.user)
@@ -145,7 +146,7 @@ export default function LoginPage() {
               href="/signup"
               className="font-medium text-[#0f8a96] hover:text-[#0f717b] transition-colors duration-300"
             >
-              Don't have an account? Sign up
+              Dont have an account? Sign up
             </Link>
           </div>
         </form>
