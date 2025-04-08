@@ -6,19 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { 
   FaArrowLeft, 
-  FaSave, 
-  FaBuilding, 
-  FaEnvelope, 
-  FaPhone, 
-  FaMapMarkerAlt, 
-  FaCalendarAlt, 
-  FaUsers, 
-  FaTasks, 
-  FaExclamationCircle, 
-  FaDollarSign,
   FaPlus
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -90,7 +79,7 @@ export default function AddProjectPage() {
     setValue('teamMembers', updatedMembers);
   };
 
-  const onSubmit = async (data: ProjectFormData) => {
+  const onSubmit = async () => {
     try {
       setIsSubmitting(true);
       // TODO: Replace with actual API call
@@ -98,6 +87,7 @@ export default function AddProjectPage() {
       toast.success('Project created successfully!');
       router.push('/projects');
     } catch (error) {
+      console.log(error)
       toast.error('Failed to create project. Please try again.');
     } finally {
       setIsSubmitting(false);
