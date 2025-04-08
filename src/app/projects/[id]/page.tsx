@@ -295,7 +295,7 @@ export default function ProjectDetailsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Project not found</h1>
+          <h1 className="text-2xl font-bold text-white">Project not found</h1>
           <Link href="/projects" className="text-blue-600 hover:underline mt-4 inline-block">
             Back to Projects
           </Link>
@@ -313,7 +313,7 @@ export default function ProjectDetailsPage() {
       case 'todo':
         return 'bg-yellow-100 text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[#0f717b] text-gray-800';
     }
   };
 
@@ -345,13 +345,11 @@ export default function ProjectDetailsPage() {
 
   const handleAddMember = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add your member addition logic here
     setShowAddMember(false);
   };
 
   const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add your task addition logic here
     setShowAddTask(false);
   };
 
@@ -364,13 +362,13 @@ export default function ProjectDetailsPage() {
       >
         <Link 
           href="/projects" 
-          className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6 group transition-colors"
+          className="inline-flex items-center text-white hover:text-white mb-6 group transition-colors"
         >
           <FaArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Back to Projects
         </Link>
 
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-100 hover:shadow-xl transition-all duration-300">
+        <div className="bg-gray-700 rounded-xl shadow-lg p-8 mb-8 hover:shadow-xl transition-all duration-300">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -380,19 +378,19 @@ export default function ProjectDetailsPage() {
                 </span>
               </div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">{project.projectName}</h1>
-              <p className="text-gray-600 mt-2 text-lg">{project.description}</p>
+              <p className="text-white mt-2 text-lg">{project.description}</p>
             </div>
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => setShowAddMember(true)}
-                className="flex items-center px-4 py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-200 border border-gray-200 hover:border-gray-300"
+                className="flex items-center px-4 py-2 bg-[#0f717b] text-white rounded-lg hover:bg-[#0f717b] transition-all duration-200 border-gray-200 hover:border-gray-300"
               >
                 <FaUserPlus className="w-5 h-5 mr-2" />
                 Add Member
               </button>
               <button 
                 onClick={() => setShowAddTask(true)}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                className="flex items-center px-4 py-2 bg-[#0f717b] text-white rounded-lg hover:bg-[#3b6f75] transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 <FaPlus className="w-5 h-5 mr-2" />
                 Add Task
@@ -401,71 +399,71 @@ export default function ProjectDetailsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <FaBuilding className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center gap-3 p-4 bg-[#0f717b] rounded-lg hover:border-gray-200 transition-colors">
+              <div className="p-2 bg-[#0f717b] rounded-lg shadow-sm">
+                <FaBuilding className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Client</p>
-                <p className="font-medium text-gray-900">{project.clientName}</p>
+                <p className="text-sm text-white">Client</p>
+                <p className="font-medium text-white">{project.clientName}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <FaEnvelope className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center gap-3 p-4 bg-[#0f717b] rounded-lg hover:border-gray-200 transition-colors">
+              <div className="p-2 bg-[#0f717b] rounded-lg shadow-sm">
+                <FaEnvelope className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium text-gray-900">{project.clientEmail}</p>
+                <p className="text-sm text-white">Email</p>
+                <p className="font-medium text-white">{project.clientEmail}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <FaPhone className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center gap-3 p-4 bg-[#0f717b] rounded-lg hover:border-gray-200 transition-colors">
+              <div className="p-2 bg-[#0f717b] rounded-lg shadow-sm">
+                <FaPhone className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Phone</p>
-                <p className="font-medium text-gray-900">{project.clientPhone}</p>
+                <p className="text-sm text-white">Phone</p>
+                <p className="font-medium text-white">{project.clientPhone}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <FaMapMarkerAlt className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center gap-3 p-4 bg-[#0f717b] rounded-lg hover:border-gray-200 transition-colors">
+              <div className="p-2 bg-[#0f717b] rounded-lg shadow-sm">
+                <FaMapMarkerAlt className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Address</p>
-                <p className="font-medium text-gray-900 line-clamp-1">{project.clientAddress}</p>
+                <p className="text-sm text-white">Address</p>
+                <p className="font-medium text-white line-clamp-1">{project.clientAddress}</p>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-8 mt-8 text-sm">
-            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <FaCalendarAlt className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center gap-2 p-3 bg-[#0f717b] rounded-lg border-gray-100">
+              <FaCalendarAlt className="w-5 h-5 text-white" />
               <div>
-                <p className="text-gray-500">Start Date</p>
-                <p className="font-medium text-gray-900">1234567</p>
+                <p className="text-white">Start Date</p>
+                <p className="font-medium text-white">1234567</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <FaClock className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center gap-2 p-3 bg-[#0f717b] rounded-lg border-gray-100">
+              <FaClock className="w-5 h-5 text-white" />
               <div>
-                <p className="text-gray-500">End Date</p>
-                <p className="font-medium text-gray-900">1234567</p>
+                <p className="text-white">End Date</p>
+                <p className="font-medium text-white">1234567</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-100">
+        <div className="bg-gray-700 rounded-xl shadow-lg p-8 mb-8 border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-50 rounded-lg">
                 <FaUsers className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Team Members</h2>
-                <p className="text-sm text-gray-500">{project.members.length} members in the team</p>
+                <h2 className="text-xl font-semibold text-white">Team Members</h2>
+                <p className="text-sm text-white">{project.members.length} members in the team</p>
               </div>
             </div>
           </div>
@@ -477,14 +475,14 @@ export default function ProjectDetailsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-all duration-200 hover:shadow-md"
+                className="flex items-center gap-4 p-4 bg-[#0f717b] rounded-lg hover:border-gray-200 transition-all duration-200 hover:shadow-md"
               >
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                   <span className="text-blue-600 font-medium">{member.name.charAt(0).toUpperCase()}</span>
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900">{member.name}</h3>
-                  <p className="text-sm text-gray-500">{member.role}</p>
+                  <h3 className="font-medium text-white">{member.name}</h3>
+                  <p className="text-sm text-white">{member.role}</p>
                   <p className="text-xs text-gray-400">{member.email}</p>
                 </div>
               </motion.div>
@@ -492,15 +490,15 @@ export default function ProjectDetailsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+        <div className="bg-gray-700 rounded-xl shadow-lg p-8 border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-50 rounded-lg">
                 <FaCheckCircle className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
-                <p className="text-sm text-gray-500">
+                <h2 className="text-xl font-semibold text-white">Tasks</h2>
+                <p className="text-sm text-white">
                   {tasks.filter(t => t.status === 'completed').length} / {tasks.length} completed
                 </p>
               </div>
@@ -515,7 +513,7 @@ export default function ProjectDetailsPage() {
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -523,7 +521,7 @@ export default function ProjectDetailsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                className="px-4 py-2.5 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
               >
                 <option value="all">All Status</option>
                 <option value="completed">Completed</option>
@@ -540,25 +538,25 @@ export default function ProjectDetailsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="border border-gray-100 rounded-lg p-6 hover:border-gray-200 transition-all duration-200 hover:shadow-md bg-gray-50"
+                className="rounded-lg p-6 hover:border-gray-200 transition-all duration-200 hover:shadow-md bg-[#0f717b]"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <h3 className="font-medium text-gray-900 text-lg">{task.title}</h3>
+                      <h3 className="font-medium text-white text-lg">{task.title}</h3>
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${getStatusColor(task.status)} shadow-sm`}>
                         {getStatusIcon(task.status)}
                         {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                       </span>
                     </div>
-                    <p className="text-gray-600 mt-2">{task.description}</p>
+                    <p className="text-white mt-2">{task.description}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <FaFlag className={`w-5 h-5 ${getPriorityColor(task.priority)}`} />
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6 mt-4 text-sm text-gray-500">
+                <div className="flex items-center gap-6 mt-4 text-sm text-white">
                   <div className="flex items-center gap-2">
                     <FaUser className="w-4 h-4" />
                     <span>{task.assignedTo}</span>
@@ -581,8 +579,8 @@ export default function ProjectDetailsPage() {
               <div className="text-gray-400 mb-4">
                 <FaExclamationCircle className="w-12 h-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
-              <p className="text-gray-600">Add a new task to get started</p>
+              <h3 className="text-lg font-medium text-white mb-2">No tasks found</h3>
+              <p className="text-white">Add a new task to get started</p>
             </div>
           )}
         </div>
@@ -600,56 +598,56 @@ export default function ProjectDetailsPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl p-8 max-w-md w-full shadow-2xl"
+              className="bg-gray-700 rounded-xl p-8 max-w-md w-full shadow-2xl"
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900">Add Team Member</h2>
+                <h2 className="text-2xl font-semibold text-white">Add Team Member</h2>
                 <button 
                   onClick={() => setShowAddMember(false)}
-                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-gray-500 hover:text-white transition-colors"
                 >
                   <FaTimes className="w-5 h-5" />
                 </button>
               </div>
               <form onSubmit={handleAddMember} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label className="block text-sm font-medium text-white mb-1">Name</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                    className="w-full px-4 py-2.5 rounded-lg border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
                     placeholder="Enter member name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                  <label className="block text-sm font-medium text-white mb-1">Role</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                    className="w-full px-4 py-2.5 rounded-lg border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
                     placeholder="Enter member role"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-white mb-1">Email</label>
                   <input
                     type="email"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                    className="w-full px-4 py-2.5 rounded-lg border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
                     placeholder="Enter member email"
                   />
                 </div>
                 <div className="flex gap-3 pt-2">
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+                    className="flex-1 bg-[#0f717b] text-white py-2.5 px-4 rounded-lg hover:bg-[#0ccce2] transition-colors shadow-md hover:shadow-lg"
                   >
                     Add Member
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowAddMember(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 py-2.5 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 bg-[#0f717b]  text-white py-2.5 px-4 rounded-lg hover:bg-[#0ccce2] transition-colors"
                   >
                     Cancel
                   </button>
@@ -672,41 +670,41 @@ export default function ProjectDetailsPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl p-8 max-w-md w-full shadow-2xl"
+              className="bg-gray-700 rounded-xl p-8 max-w-md w-full shadow-2xl"
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900">Add New Task</h2>
+                <h2 className="text-2xl font-semibold text-white">Add New Task</h2>
                 <button 
                   onClick={() => setShowAddTask(false)}
-                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-gray-500 hover:text-white transition-colors"
                 >
                   <FaTimes className="w-5 h-5" />
                 </button>
               </div>
               <form onSubmit={handleAddTask} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <label className="block text-sm font-medium text-white mb-1">Title</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                    className="w-full px-4 py-2.5 rounded-lg border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
                     placeholder="Enter task title"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-white mb-1">Description</label>
                   <textarea
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                    className="w-full px-4 py-2.5 rounded-lg border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
                     placeholder="Enter task description"
                     rows={3}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+                  <label className="block text-sm font-medium text-white mb-1">Assigned To</label>
                   <select
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                    className="w-full px-4 py-2.5 rounded-lg border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
                   >
                     {project.members.map(member => (
                       <option key={member.email} value={member.name}>
@@ -716,24 +714,24 @@ export default function ProjectDetailsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                  <label className="block text-sm font-medium text-white mb-1">Due Date</label>
                   <input
                     type="date"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                    className="w-full px-4 py-2.5 rounded-lg border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[#0f717b]"
                   />
                 </div>
                 <div className="flex gap-3 pt-2">
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+                    className="flex-1 bg-[#0f717b] text-white py-2.5 px-4 rounded-lg hover:bg-[#0ccce2] transition-colors shadow-md hover:shadow-lg"
                   >
                     Add Task
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowAddTask(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 py-2.5 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 bg-[#0f717b] text-white py-2.5 px-4 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Cancel
                   </button>
