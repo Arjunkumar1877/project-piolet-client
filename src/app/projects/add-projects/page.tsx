@@ -18,7 +18,8 @@ import {
   FaUsers, 
   FaTasks, 
   FaExclamationCircle, 
-  FaDollarSign
+  FaDollarSign,
+  FaPlus
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -104,54 +105,61 @@ export default function AddProjectPage() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="min-h-screen  text-white p-6"
-    >
+    <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <Link
-            href="/projects"
-            className="flex items-center text-gray-400 hover:text-white transition-colors"
-          >
-            <FaArrowLeft className="mr-2" />
+          <div>
+            <h1 className="text-3xl font-bold text-white">Add New Project</h1>
+            <p className="text-gray-400 mt-1">Create a new project and assign team members</p>
+          </div>
+          <Link href="/projects" className="flex items-center gap-2 text-gray-400 hover:text-teal-400 transition-colors">
+            <FaArrowLeft className="w-5 h-5" />
             Back to Projects
           </Link>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#0f717b] to-purple-500 bg-clip-text text-transparent">
-            Add New Project
-          </h1>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          {/* Basic Information */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-6 text-[#0f717b]">Basic Information</h2>
+          {/* Project Details Section */}
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+            <h2 className="text-xl font-semibold text-white mb-6">Project Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="projectName" className="block text-sm font-medium text-gray-300 mb-2">
                   Project Name
                 </label>
-                <div className="relative">
-                  <input
-                    {...register('projectName')}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter project name"
-                  />
-                  {errors.projectName && (
-                    <p className="mt-1 text-sm text-red-400">{errors.projectName.message}</p>
-                  )}
-                </div>
+                <input
+                  {...register('projectName')}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  placeholder="Enter project name"
+                />
+                {errors.projectName && (
+                  <p className="mt-1 text-sm text-red-400">{errors.projectName.message}</p>
+                )}
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-2">
+                  Status
+                </label>
+                <select
+                  {...register('status')}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                >
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                  <option value="on-hold">On Hold</option>
+                </select>
+                {errors.status && (
+                  <p className="mt-1 text-sm text-red-400">{errors.status.message}</p>
+                )}
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
                   Description
                 </label>
                 <textarea
                   {...register('description')}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
                   placeholder="Enter project description"
                 />
                 {errors.description && (
@@ -161,81 +169,60 @@ export default function AddProjectPage() {
             </div>
           </div>
 
-          {/* Client Information */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-6 text-[#0f717b]">Client Information</h2>
+          {/* Client Information Section */}
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+            <h2 className="text-xl font-semibold text-white mb-6">Client Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="clientName" className="block text-sm font-medium text-gray-300 mb-2">
                   Client Name
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaBuilding className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register('clientName')}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter client name"
-                  />
-                </div>
+                <input
+                  {...register('clientName')}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  placeholder="Enter client name"
+                />
                 {errors.clientName && (
                   <p className="mt-1 text-sm text-red-400">{errors.clientName.message}</p>
                 )}
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="clientEmail" className="block text-sm font-medium text-gray-300 mb-2">
                   Client Email
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaEnvelope className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register('clientEmail')}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter client email"
-                  />
-                </div>
+                <input
+                  {...register('clientEmail')}
+                  type="email"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  placeholder="Enter client email"
+                />
                 {errors.clientEmail && (
                   <p className="mt-1 text-sm text-red-400">{errors.clientEmail.message}</p>
                 )}
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="clientPhone" className="block text-sm font-medium text-gray-300 mb-2">
                   Client Phone
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaPhone className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register('clientPhone')}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter client phone"
-                  />
-                </div>
+                <input
+                  {...register('clientPhone')}
+                  type="tel"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  placeholder="Enter client phone"
+                />
                 {errors.clientPhone && (
                   <p className="mt-1 text-sm text-red-400">{errors.clientPhone.message}</p>
                 )}
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="clientAddress" className="block text-sm font-medium text-gray-300 mb-2">
                   Client Address
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaMapMarkerAlt className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register('clientAddress')}
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter client address"
-                  />
-                </div>
+                <input
+                  {...register('clientAddress')}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  placeholder="Enter client address"
+                />
                 {errors.clientAddress && (
                   <p className="mt-1 text-sm text-red-400">{errors.clientAddress.message}</p>
                 )}
@@ -243,194 +230,127 @@ export default function AddProjectPage() {
             </div>
           </div>
 
-          {/* Project Details */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-6 text-[#0f717b]">Project Details</h2>
+          {/* Project Timeline Section */}
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+            <h2 className="text-xl font-semibold text-white mb-6">Project Timeline</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="startDate" className="block text-sm font-medium text-gray-300 mb-2">
                   Start Date
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaCalendarAlt className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register('startDate')}
-                    type="date"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+                <input
+                  {...register('startDate')}
+                  type="date"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                />
                 {errors.startDate && (
                   <p className="mt-1 text-sm text-red-400">{errors.startDate.message}</p>
                 )}
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="endDate" className="block text-sm font-medium text-gray-300 mb-2">
                   End Date
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaCalendarAlt className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register('endDate')}
-                    type="date"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+                <input
+                  {...register('endDate')}
+                  type="date"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                />
                 {errors.endDate && (
                   <p className="mt-1 text-sm text-red-400">{errors.endDate.message}</p>
                 )}
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Status
-                </label>
-                <select
-                  {...register('status')}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="active">Active</option>
-                  <option value="completed">Completed</option>
-                  <option value="on-hold">On Hold</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Priority
-                </label>
-                <select
-                  {...register('priority')}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Budget
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaDollarSign className="text-gray-400" />
-                  </div>
-                  <input
-                    {...register('budget')}
-                    type="number"
-                    className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter project budget"
-                  />
-                </div>
-                {errors.budget && (
-                  <p className="mt-1 text-sm text-red-400">{errors.budget.message}</p>
-                )}
-              </div>
             </div>
           </div>
 
-          {/* Team Members */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-6 text-[#0f717b]">Team Members</h2>
-            <div className="space-y-4">
-              {teamMembers.map((member, index) => (
-                <div key={index} className="flex items-center justify-between bg-gray-700 p-4 rounded-lg">
-                  <div>
-                    <p className="font-medium">{member.name}</p>
-                    <p className="text-sm text-gray-400">{member.role}</p>
-                    <p className="text-sm text-gray-400">{member.email}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeTeamMember(index)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
-                  type="text"
-                  value={newMember.name}
-                  onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                  placeholder="Name"
-                  className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  value={newMember.role}
-                  onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
-                  placeholder="Role"
-                  className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="email"
-                  value={newMember.email}
-                  onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                  placeholder="Email"
-                  className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+          {/* Team Members Section */}
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-white">Team Members</h2>
               <button
                 type="button"
                 onClick={addTeamMember}
-                className="w-full bg-[#0f717b] hover:bg-[#4899a2] text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
               >
-                Add Team Member
+                <FaPlus className="w-4 h-4" />
+                Add Member
               </button>
+            </div>
+            <div className="space-y-4">
+              {teamMembers.map((member, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-800/80 rounded-lg border border-gray-700/50">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      value={member.name}
+                      onChange={(e) => {
+                        const updatedMembers = teamMembers.map((m, i) =>
+                          i === index ? { ...m, name: e.target.value } : m
+                        );
+                        setTeamMembers(updatedMembers);
+                        setValue('teamMembers', updatedMembers);
+                      }}
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                      placeholder="Enter member name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Role
+                    </label>
+                    <input
+                      type="text"
+                      value={member.role}
+                      onChange={(e) => {
+                        const updatedMembers = teamMembers.map((m, i) =>
+                          i === index ? { ...m, role: e.target.value } : m
+                        );
+                        setTeamMembers(updatedMembers);
+                        setValue('teamMembers', updatedMembers);
+                      }}
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                      placeholder="Enter member role"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={() => removeTeamMember(index)}
+                      className="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Notes */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-semibold mb-6 text-[#0f717b]">Additional Notes</h2>
-            <textarea
-              {...register('notes')}
-              className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={4}
-              placeholder="Enter any additional notes about the project"
-            />
-          </div>
-
-          {/* Form Actions */}
-          <div className="flex justify-end space-x-4">
-            <Link
-              href="/projects"
-              className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-            >
-              Cancel
-            </Link>
+          {/* Submit Button */}
+          <div className="flex justify-end">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 bg-[#0f717b] hover:bg-[#4899a2] text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <div className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Creating...
-                </>
+                </div>
               ) : (
-                <>
-                  <FaSave className="mr-2" />
-                  Create Project
-                </>
+                'Create Project'
               )}
             </button>
           </div>
         </form>
       </div>
-    </motion.div>
+    </div>
   );
 } 

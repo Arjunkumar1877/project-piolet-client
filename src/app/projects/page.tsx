@@ -76,13 +76,13 @@ export default function ProjectsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-900/30 text-emerald-400';
       case 'completed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-900/30 text-blue-400';
       case 'on-hold':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-900/30 text-amber-400';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-800/30 text-gray-400';
     }
   };
 
@@ -104,10 +104,10 @@ export default function ProjectsPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-          <p className="text-gray-600 mt-1">Manage and track your projects</p>
+          <h1 className="text-3xl font-bold text-white">Projects</h1>
+          <p className="text-gray-400 mt-1">Manage and track your projects</p>
         </div>
-        <button onClick={() => router.push('/projects/add-projects')} className="flex items-center px-4 py-2 bg-[#0f717b] text-white rounded-lg hover:bg-[#488289] transition-colors">
+        <button onClick={() => router.push('/projects/add-projects')} className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
           <FaPlus className="w-5 h-5 mr-2" />
           New Project
         </button>
@@ -122,7 +122,7 @@ export default function ProjectsPage() {
             placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -130,7 +130,7 @@ export default function ProjectsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -148,9 +148,9 @@ export default function ProjectsPage() {
             href={`/projects/${project.id}`}
             className="group block"
           >
-            <div className="bg-gray-700  rounded-xl shadow-sm  hover:shadow-md hover:border-blue-500 transition-all duration-200 overflow-hidden h-full flex flex-col">
+            <div className="bg-gray-800/50 rounded-xl shadow-sm hover:shadow-md hover:border-teal-500/50 border border-gray-700/50 transition-all duration-200 overflow-hidden h-full flex flex-col">
               {/* Project Header */}
-              <div className=" flex-1">
+              <div className="flex-1">
                 <div className="flex items-start justify-between mb-4 p-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
@@ -159,68 +159,68 @@ export default function ProjectsPage() {
                         {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                       </span>
                     </div>
-                    <h3 className="text-xl font-semibold text-white group-hover:text-[#0f717b] transition-colors line-clamp-1">
+                    <h3 className="text-xl font-semibold text-white group-hover:text-teal-400 transition-colors line-clamp-1">
                       {project.projectName}
                     </h3>
-                    <p className="text-white mt-2 line-clamp-2 text-sm">{project.description}</p>
+                    <p className="text-gray-400 mt-2 line-clamp-2 text-sm">{project.description}</p>
                   </div>
                 </div>
 
                 {/* Client Info */}
-               <div className="p-6">
-               <div className="space-y-2.5 bg-[#0f717b] rounded-lg p-6">
-                  <div className="flex items-center gap-2">
-                    <FaBuilding className="w-5 h-5 text-white" />
-                    <span className="text-sm text-white">{project.clientName}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaEnvelope className="w-5 h-5 text-white" />
-                    <span className="text-sm text-white">{project.clientEmail}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaPhone className="w-5 h-5 text-white" />
-                    <span className="text-sm text-white">{project.clientPhone}</span>
+                <div className="p-6">
+                  <div className="space-y-2.5 bg-gray-800/80 rounded-lg p-6 border border-gray-700/50">
+                    <div className="flex items-center gap-2">
+                      <FaBuilding className="w-5 h-5 text-teal-400" />
+                      <span className="text-sm text-gray-300">{project.clientName}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaEnvelope className="w-5 h-5 text-teal-400" />
+                      <span className="text-sm text-gray-300">{project.clientEmail}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaPhone className="w-5 h-5 text-teal-400" />
+                      <span className="text-sm text-gray-300">{project.clientPhone}</span>
+                    </div>
                   </div>
                 </div>
-               </div>
 
                 {/* Project Stats */}
-                <div className="border-t border-gray-100">
+                <div className="border-t border-gray-700/50">
                   <div className="flex items-center justify-between p-6">
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-blue-50 rounded-lg">
-                          <FaUsers className="w-5 h-5 text-blue-600" />
+                        <div className="p-1.5 bg-blue-900/30 rounded-lg">
+                          <FaUsers className="w-5 h-5 text-blue-400" />
                         </div>
-                        <span className="text-sm font-medium text-white">{project.members.length} members</span>
+                        <span className="text-sm font-medium text-gray-300">{project.members.length} members</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-green-50 rounded-lg">
-                          <FaClock className="w-5 h-5 text-green-600" />
+                        <div className="p-1.5 bg-emerald-900/30 rounded-lg">
+                          <FaClock className="w-5 h-5 text-emerald-400" />
                         </div>
-                        <span className="text-sm font-medium text-white">
+                        <span className="text-sm font-medium text-gray-300">
                           {project.tasks.completed}/{project.tasks.total} tasks
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[#0f717b]group-hover:gap-3 transition-all">
+                    <div className="flex items-center gap-2 text-teal-400 group-hover:gap-3 transition-all">
                       <span className="text-sm font-medium">View Details</span>
-                      <FaArrowRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                      <FaArrowRight className="w-5 h-5 text-teal-400/70 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Project Timeline */}
-              <div className="px-6 py-4 bg-gray-700 border-t border-gray-100">
+              <div className="px-6 py-4 bg-gray-800/30 border-t border-gray-700/50">
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
-                    <FaCalendarAlt className="w-5 h-5 text-white" />
-                    <span className="text-sm text-white">Start: {project.startDate.toLocaleDateString()}</span>
+                    <FaCalendarAlt className="w-5 h-5 text-gray-400" />
+                    <span className="text-sm text-gray-400">Start: {project.startDate.toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FaClock className="w-5 h-5 text-white" />
-                    <span className="text-sm text-white">End: {project.endDate.toLocaleDateString()}</span>
+                    <FaClock className="w-5 h-5 text-gray-400" />
+                    <span className="text-sm text-gray-400">End: {project.endDate.toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
@@ -232,11 +232,11 @@ export default function ProjectsPage() {
       {/* Empty State */}
       {filteredProjects.length === 0 && (
         <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">
+          <div className="text-gray-500 mb-4">
             <FaExclamationCircle className="w-12 h-12 mx-auto" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No projects found</h3>
-          <p className="text-white">Try adjusting your search or filter criteria</p>
+          <h3 className="text-lg font-medium text-white mb-2">No projects found</h3>
+          <p className="text-gray-400">Try adjusting your search or filter criteria</p>
         </div>
       )}
     </div>
