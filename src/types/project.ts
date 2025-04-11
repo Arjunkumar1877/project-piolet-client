@@ -21,3 +21,15 @@ export interface ProjectMember {
   role: string;
   email: string;
 }
+
+
+export type TeamMember = {
+  _id: string
+  name: string
+  role: string
+  email: string
+  projects: string[] 
+  createdAt: string
+  updatedAt: string
+  __v: number
+}

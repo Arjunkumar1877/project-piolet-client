@@ -11,6 +11,8 @@ import {
   FaPlus
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { useGetMembers } from '@/src/api/query';
+import { TeamMember } from '@/src/types/project';
 
 const projectSchema = z.object({
   projectName: z.string().min(1, 'Project name is required'),
@@ -39,12 +41,10 @@ export default function AddProjectPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamMembers, setTeamMembers] = useState<Array<{ name: string; role: string; email: string }>>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
+  const { data: members } = useGetMembers();
 
-  const availableTeamMembers = [
-    { name: 'John Doe', role: 'Developer', email: 'john@example.com' },
-    { name: 'Jane Smith', role: 'Designer', email: 'jane@example.com' },
-    { name: 'Mike Johnson', role: 'Project Manager', email: 'mike@example.com' },
-  ];
+  console.log(members)
+  const availableTeamMembers = members;
 
   const {
     register,
@@ -272,7 +272,7 @@ export default function AddProjectPage() {
                   className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
                 >
                   <option value="">Select a team member</option>
-                  {availableTeamMembers.map((member) => (
+                  {availableTeamMembers.map((member: TeamMember) => (
                     <option key={member.email} value={member.name}>
                       {member.name} - {member.role}
                     </option>
