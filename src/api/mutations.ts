@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from './axios'
+import { CreateProject } from '../types/project'
 
 export function useSignup() {
   const qc = useQueryClient()
@@ -73,5 +74,35 @@ export function useAddMembers() {
 
   return mutation
 }
+
+
+
+
+
+
+
+
+export function useCreateProject() {
+  const mutation = useMutation({
+    mutationFn: async (data: CreateProject) => {
+      const response = await api.post('/projects', data);
+        return response.data
+
+    },
+    onSuccess: (data) => {
+      console.log('saved member successful', data)
+    },
+    onError: (error: Error) => {
+      console.error('saved member failed:', error.message)
+    },
+  })
+
+  return mutation
+}
+
+
+
+
+
 
 

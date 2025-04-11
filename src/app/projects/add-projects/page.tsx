@@ -13,6 +13,7 @@ import {
 import toast from 'react-hot-toast';
 import { useGetMembers } from '@/src/api/query';
 import { TeamMember } from '@/src/types/project';
+import { useCreateProject } from '@/src/api/mutations';
 
 const projectSchema = z.object({
   projectName: z.string().min(1, 'Project name is required'),
@@ -39,11 +40,12 @@ type ProjectFormData = z.infer<typeof projectSchema>;
 export default function AddProjectPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [teamMembers, setTeamMembers] = useState<Array<{ name: string; role: string; email: string }>>([]);
+  const [teamMembers, setTeamMembers] = useState<Array<{
+    _id: any; name: string; role: string; email: string 
+}>>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
   const { data: members } = useGetMembers();
 
-  console.log(members)
   const availableTeamMembers = members;
 
   const {
@@ -70,9 +72,13 @@ export default function AddProjectPage() {
     },
   });
 
+  // Add logging for form validation
+  console.log('Form errors:', errors);
+  console.log('Form is ready:', Object.keys(register).length > 0);
+
   const addTeamMember = () => {
     if (selectedMember) {
-      const member = availableTeamMembers.find(m => m.name === selectedMember);
+      const member = availableTeamMembers.find((m: TeamMember) => m.name === selectedMember);
       if (member && !teamMembers.some(m => m.name === member.name)) {
         setTeamMembers([...teamMembers, member]);
         setValue('teamMembers', [...teamMembers, member]);
@@ -87,19 +93,45 @@ export default function AddProjectPage() {
     setValue('teamMembers', updatedMembers);
   };
 
-  const onSubmit = async () => {
+  const createProject = useCreateProject();
+
+  const onSubmit = async (data: ProjectFormData) => {
+    console.log('Form submission started');
+    console.log('Raw form data:', data);
+    console.log('Team members state:', teamMembers);
     try {
       setIsSubmitting(true);
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const transformedData = {
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        teamMembers: teamMembers.map(member => member._id)
+      };
+      console.log('Transformed data for API:', transformedData);
+      
+      // Add more detailed logging for the API call
+      console.log('Making API call with:', {
+        url: '/projects',
+        data: transformedData
+      });
+      
+      const result = await createProject.mutateAsync(transformedData);
+      console.log('API response:', result);
+      
       toast.success('Project created successfully!');
       router.push('/projects');
     } catch (error) {
-      console.log(error)
+      console.error('Error creating project:', error);
       toast.error('Failed to create project. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Add a test button to verify form submission
+  const testSubmit = () => {
+    console.log('Test button clicked');
+    handleSubmit(onSubmit)();
   };
 
   return (
@@ -261,6 +293,62 @@ export default function AddProjectPage() {
             </div>
           </div>
 
+          {/* Project Budget and Priority Section */}
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+            <h2 className="text-xl font-semibold text-white mb-6">Project Budget & Priority</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="budget" className="block text-sm font-medium text-gray-300 mb-2">
+                  Budget
+                </label>
+                <input
+                  {...register('budget')}
+                  type="text"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  placeholder="Enter project budget"
+                />
+                {errors.budget && (
+                  <p className="mt-1 text-sm text-red-400">{errors.budget.message}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="priority" className="block text-sm font-medium text-gray-300 mb-2">
+                  Priority
+                </label>
+                <select
+                  {...register('priority')}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+                {errors.priority && (
+                  <p className="mt-1 text-sm text-red-400">{errors.priority.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Project Notes Section */}
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+            <h2 className="text-xl font-semibold text-white mb-6">Additional Notes</h2>
+            <div>
+              <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-2">
+                Notes
+              </label>
+              <textarea
+                {...register('notes')}
+                rows={4}
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                placeholder="Enter any additional notes about the project"
+              />
+              {errors.notes && (
+                <p className="mt-1 text-sm text-red-400">{errors.notes.message}</p>
+              )}
+            </div>
+          </div>
+
           {/* Team Members Section */}
           <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
             <div className="flex items-center justify-between mb-6">
@@ -272,7 +360,7 @@ export default function AddProjectPage() {
                   className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
                 >
                   <option value="">Select a team member</option>
-                  {availableTeamMembers.map((member: TeamMember) => (
+                  { availableTeamMembers && availableTeamMembers.map((member: TeamMember) => (
                     <option key={member.email} value={member.name}>
                       {member.name} - {member.role}
                     </option>
@@ -308,8 +396,16 @@ export default function AddProjectPage() {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end">
+          {/* Add a test button */}
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={testSubmit}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Test Submit
+            </button>
+            
             <button
               type="submit"
               disabled={isSubmitting}
