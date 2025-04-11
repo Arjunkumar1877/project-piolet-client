@@ -6,14 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  FaArrowLeft, 
-  FaPlus
-} from 'react-icons/fa';
+import { FaArrowLeft, FaPlus } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useGetMembers } from '@/src/api/query';
 import { TeamMember } from '@/src/types/project';
-import { useCreateProject } from '@/src/api/mutations';
+import { useProject } from '@/src/api/mutations';
+import { useAuthStore } from '@/src/store/useAuthStore';
+import { format, parseISO } from 'date-fns';
 
 const projectSchema = z.object({
   projectName: z.string().min(1, 'Project name is required'),
@@ -39,14 +38,16 @@ type ProjectFormData = z.infer<typeof projectSchema>;
 
 export default function AddProjectPage() {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamMembers, setTeamMembers] = useState<Array<{
     _id: any; name: string; role: string; email: string 
-}>>([]);
+  }>>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
-  const { data: members } = useGetMembers();
 
-  const availableTeamMembers = members;
+  const { data: members, isLoading } = useGetMembers({ userId: user?._id || '' });
+
+  const availableTeamMembers = members || [];
 
   const {
     register,
@@ -72,10 +73,6 @@ export default function AddProjectPage() {
     },
   });
 
-  // Add logging for form validation
-  console.log('Form errors:', errors);
-  console.log('Form is ready:', Object.keys(register).length > 0);
-
   const addTeamMember = () => {
     if (selectedMember) {
       const member = availableTeamMembers.find((m: TeamMember) => m.name === selectedMember);
@@ -93,29 +90,25 @@ export default function AddProjectPage() {
     setValue('teamMembers', updatedMembers);
   };
 
-  const createProject = useCreateProject();
+  const Project = useProject();
 
   const onSubmit = async (data: ProjectFormData) => {
-    console.log('Form submission started');
-    console.log('Raw form data:', data);
-    console.log('Team members state:', teamMembers);
+    if (!user?._id) {
+      toast.error('Please wait while we initialize your session');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const transformedData = {
         ...data,
+        userId: user._id,
         startDate: new Date(data.startDate),
         endDate: new Date(data.endDate),
         teamMembers: teamMembers.map(member => member._id)
       };
-      console.log('Transformed data for API:', transformedData);
       
-      // Add more detailed logging for the API call
-      console.log('Making API call with:', {
-        url: '/projects',
-        data: transformedData
-      });
-      
-      const result = await createProject.mutateAsync(transformedData);
+      const result = await Project.mutateAsync(transformedData);
       console.log('API response:', result);
       
       toast.success('Project created successfully!');
@@ -126,12 +119,6 @@ export default function AddProjectPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  // Add a test button to verify form submission
-  const testSubmit = () => {
-    console.log('Test button clicked');
-    handleSubmit(onSubmit)();
   };
 
   return (
@@ -213,7 +200,7 @@ export default function AddProjectPage() {
                   placeholder="Enter client name"
                 />
                 {errors.clientName && (
-                  <p className="mt-1 text-sm text-red-400">{errors.clientName.message}</p>
+                  <p className="mt AGN-1 text-sm text-red-400">{errors.clientName.message}</p>
                 )}
               </div>
               <div>
@@ -272,6 +259,8 @@ export default function AddProjectPage() {
                   {...register('startDate')}
                   type="date"
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                  min={format(new Date(), 'yyyy-MM-dd')}
+                  defaultValue={format(new Date(), 'yyyy-MM-dd')}
                 />
                 {errors.startDate && (
                   <p className="mt-1 text-sm text-red-400">{errors.startDate.message}</p>
@@ -285,6 +274,8 @@ export default function AddProjectPage() {
                   {...register('endDate')}
                   type="date"
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                  min={format(new Date(), 'yyyy-MM-dd')}
+                  defaultValue={format(new Date(), 'yyyy-MM-dd')}
                 />
                 {errors.endDate && (
                   <p className="mt-1 text-sm text-red-400">{errors.endDate.message}</p>
@@ -350,65 +341,67 @@ export default function AddProjectPage() {
           </div>
 
           {/* Team Members Section */}
-          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Team Members</h2>
-              <div className="flex items-center gap-4">
-                <select
-                  value={selectedMember}
-                  onChange={(e) => setSelectedMember(e.target.value)}
-                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
-                >
-                  <option value="">Select a team member</option>
-                  { availableTeamMembers && availableTeamMembers.map((member: TeamMember) => (
-                    <option key={member.email} value={member.name}>
-                      {member.name} - {member.role}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={addTeamMember}
-                  className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-                >
-                  <FaPlus className="w-4 h-4" />
-                  Add Member
-                </button>
-              </div>
+          {!user?._id ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
             </div>
-            <div className="space-y-4">
-              {teamMembers.map((member, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-800/80 rounded-lg border border-gray-700/50">
-                  <div>
-                    <p className="text-white font-medium">{member.name}</p>
-                    <p className="text-gray-400 text-sm">{member.role}</p>
-                    <p className="text-gray-400 text-sm">{member.email}</p>
-                  </div>
+          ) : isLoading ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+            </div>
+          ) : (
+            <div className="bg Deprecated-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-white">Team Members</h2>
+                <div className="flex items-center gap-4">
+                  <select
+                    value={selectedMember}
+                    onChange={(e) => setSelectedMember(e.target.value)}
+                    className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                  >
+                    <option value="">Select a team member</option>
+                    {availableTeamMembers.map((member: TeamMember) => (
+                      <option key={member.email} value={member.name}>
+                        {member.name} - {member.role}
+                      </option>
+                    ))}
+                  </select>
                   <button
                     type="button"
-                    onClick={() => removeTeamMember(index)}
-                    className="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                    onClick={addTeamMember}
+                    className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
                   >
-                    Remove
+                    <FaPlus className="w-4 h-4" />
+                    Add Member
                   </button>
                 </div>
-              ))}
+              </div>
+              <div className="space-y-4">
+                {teamMembers.map((member, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-800/80 rounded-lg border border-gray-700/50">
+                    <div>
+                      <p className="text-white font-medium">{member.name}</p>
+                      <p className="text-gray-400 text-sm">{member.role}</p>
+                      <p className="text-gray-400 text-sm">{member.email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeTeamMember(index)}
+                      className="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Add a test button */}
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={testSubmit}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Test Submit
-            </button>
-            
+          {/* Submit Button */}
+          <div className="flex justify-end">
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !user?._id}
               className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
@@ -428,4 +421,4 @@ export default function AddProjectPage() {
       </div>
     </div>
   );
-} 
+}

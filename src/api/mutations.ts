@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from './axios'
-import { CreateProject } from '../types/project'
+import { Project } from '../types/project'
 
 export function useSignup() {
   const qc = useQueryClient()
@@ -57,9 +57,9 @@ export function useLogin() {
 
 export function useAddMembers() {
   const mutation = useMutation({
-    mutationFn: async ({ name, role, email }: { name: string; role: string; email: string }) => {
+    mutationFn: async ({ name, role, email , userId}: { name: string; role: string; email: string , userId: string }) => {
         const response = await api.post('/projects/team-members', {
-            name, role, email
+            name, role, email, userId
         })
         return response.data
 
@@ -82,9 +82,9 @@ export function useAddMembers() {
 
 
 
-export function useCreateProject() {
+export function useProject() {
   const mutation = useMutation({
-    mutationFn: async (data: CreateProject) => {
+    mutationFn: async (data: Project) => {
       const response = await api.post('/projects', data);
         return response.data
 

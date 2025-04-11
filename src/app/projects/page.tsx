@@ -27,6 +27,9 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAddMembers } from '@/src/api/mutations';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '@/src/store/useAuthStore';
+import { useGetProjects } from '@/src/api/query';
+import { format } from 'date-fns';
 
 const memberSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -35,61 +38,24 @@ const memberSchema = z.object({
   }),
   email: z.string().email('Invalid email address'),
 });
-
 type MemberFormData = z.infer<typeof memberSchema>;
 
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    projectName: 'E-commerce Website Development',
-    description: 'Building a modern e-commerce platform with React and Node.js',
-    clientName: 'Tech Retail Co.',
-    clientEmail: 'contact@techretail.com',
-    clientPhone: '+1 (555) 123-4567',
-    clientAddress: '123 Business Ave, Suite 100, San Francisco, CA 94105',
-    startDate: new Date('2024-03-01'),
-    endDate: new Date('2024-06-30'),
-    status: 'active',
-    tasks: {
-      total: 25,
-      completed: 12,
-    },
-    members: [
-      { name: 'Alice Johnson', role: 'Project Manager', email: 'alice@techretail.com' },
-      { name: 'Bob Smith', role: 'Lead Developer', email: 'bob@techretail.com' }
-    ]
-  },
-  {
-    id: '2',
-    projectName: 'Mobile Banking App',
-    description: 'Developing a secure mobile banking application for iOS and Android',
-    clientName: 'FinTech Solutions',
-    clientEmail: 'projects@fintechsolutions.com',
-    clientPhone: '+1 (555) 987-6543',
-    clientAddress: '456 Finance Street, New York, NY 10001',
-    startDate: new Date('2024-02-15'),
-    endDate: new Date('2024-08-15'),
-    status: 'active',
-    tasks: {
-      total: 40,
-      completed: 18,
-    },
-    members: [
-      { name: 'Charlie Davis', role: 'Mobile Developer', email: 'charlie@fintech.com' },
-      { name: 'Diana Prince', role: 'QA Engineer', email: 'diana@fintech.com' }
-    ]
-  }
-];
 
 export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showAddMember, setShowAddMember] = useState(false);
-  const filteredProjects = mockProjects.filter(project => {
+  const user = useAuthStore((state) => state.user);
+  const { data: projects, isLoading } = useGetProjects({ userId: user?._id || '' });
+  console.log(projects)
+const allProjects: Project[] = projects || []
+
+  const filteredProjects = allProjects.filter(project => {
     const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -117,7 +83,7 @@ export default function ProjectsPage() {
     }
   };
   const router = useRouter();
- const addMember = useAddMembers()
+  const addMember = useAddMembers()
 
   const {
     register,
@@ -130,7 +96,10 @@ export default function ProjectsPage() {
 
   const handleAddMember = async (data: MemberFormData) => {
     try {
-      await addMember.mutateAsync(data);
+      if (!user?._id) {
+        throw new Error('User ID is required');
+      }
+      await addMember.mutateAsync({ ...data, userId: user._id });
       toast.success('Member added successfully!');
       setShowAddMember(false);
       reset();
@@ -190,93 +159,99 @@ export default function ProjectsPage() {
       </div>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredProjects.map((project) => (
-          <Link
-            key={project.id}
-            href={`/projects/${project.id}`}
-            className="group block"
-          >
-            <div className="bg-gray-800/50 rounded-xl shadow-sm hover:shadow-md hover:border-teal-500/50 border border-gray-700/50 transition-all duration-200 overflow-hidden h-full flex flex-col">
-              {/* Project Header */}
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-4 p-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(project.status)}`}>
-                        {getStatusIcon(project.status)}
-                        {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-white group-hover:text-teal-400 transition-colors line-clamp-1">
-                      {project.projectName}
-                    </h3>
-                    <p className="text-gray-400 mt-2 line-clamp-2 text-sm">{project.description}</p>
-                  </div>
-                </div>
-
-                {/* Client Info */}
-                <div className="p-6">
-                  <div className="space-y-2.5 bg-gray-800/80 rounded-lg p-6 border border-gray-700/50">
-                    <div className="flex items-center gap-2">
-                      <FaBuilding className="w-5 h-5 text-teal-400" />
-                      <span className="text-sm text-gray-300">{project.clientName}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaEnvelope className="w-5 h-5 text-teal-400" />
-                      <span className="text-sm text-gray-300">{project.clientEmail}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FaPhone className="w-5 h-5 text-teal-400" />
-                      <span className="text-sm text-gray-300">{project.clientPhone}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Project Stats */}
-                <div className="border-t border-gray-700/50">
-                  <div className="flex items-center justify-between p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-blue-900/30 rounded-lg">
-                          <FaUsers className="w-5 h-5 text-blue-400" />
-                        </div>
-                        <span className="text-sm font-medium text-gray-300">{project.members.length} members</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-emerald-900/30 rounded-lg">
-                          <FaClock className="w-5 h-5 text-emerald-400" />
-                        </div>
-                        <span className="text-sm font-medium text-gray-300">
-                          {project.tasks.completed}/{project.tasks.total} tasks
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredProjects.map((project) => (
+            <Link
+              key={project._id}
+              href={`/projects/${project._id}`}
+              className="group block"
+            >
+              <div className="bg-gray-800/50 rounded-xl shadow-sm hover:shadow-md hover:border-teal-500/50 border border-gray-700/50 transition-all duration-200 overflow-hidden h-full flex flex-col">
+                {/* Project Header */}
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-4 p-6">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(project.status)}`}>
+                          {getStatusIcon(project.status)}
+                          {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
                         </span>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-teal-400 group-hover:gap-3 transition-all">
-                      <span className="text-sm font-medium">View Details</span>
-                      <FaArrowRight className="w-5 h-5 text-teal-400/70 group-hover:translate-x-1 transition-transform" />
+                      <h3 className="text-xl font-semibold text-white group-hover:text-teal-400 transition-colors line-clamp-1">
+                        {project.projectName}
+                      </h3>
+                      <p className="text-gray-400 mt-2 line-clamp-2 text-sm">{project.description}</p>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Project Timeline */}
-              <div className="px-6 py-4 bg-gray-800/30 border-t border-gray-700/50">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <FaCalendarAlt className="w-5 h-5 text-gray-400" />
-                    <span className="text-sm text-gray-400">Start: {project.startDate.toLocaleDateString()}</span>
+                  {/* Client Info */}
+                  <div className="p-6">
+                    <div className="space-y-2.5 bg-gray-800/80 rounded-lg p-6 border border-gray-700/50">
+                      <div className="flex items-center gap-2">
+                        <FaBuilding className="w-5 h-5 text-teal-400" />
+                        <span className="text-sm text-gray-300">{project.clientName}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FaEnvelope className="w-5 h-5 text-teal-400" />
+                        <span className="text-sm text-gray-300">{project.clientEmail}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FaPhone className="w-5 h-5 text-teal-400" />
+                        <span className="text-sm text-gray-300">{project.clientPhone}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <FaClock className="w-5 h-5 text-gray-400" />
-                    <span className="text-sm text-gray-400">End: {project.endDate.toLocaleDateString()}</span>
+
+                  {/* Project Stats */}
+                  <div className="border-t border-gray-700/50">
+                    <div className="flex items-center justify-between p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-blue-900/30 rounded-lg">
+                            <FaUsers className="w-5 h-5 text-blue-400" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-300">{project?.teamMembers?.length} members</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-emerald-900/30 rounded-lg">
+                            <FaClock className="w-5 h-5 text-emerald-400" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-300">
+                            1/4 tasks
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-teal-400 group-hover:gap-3 transition-all">
+                        <span className="text-sm font-medium">View Details</span>
+                        <FaArrowRight className="w-5 h-5 text-teal-400/70 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Project Timeline */}
+                <div className="px-6 py-4 bg-gray-800/30 border-t border-gray-700/50">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <FaCalendarAlt className="w-5 h-5 text-gray-400" />
+                      <span className="text-sm text-gray-400">Start: {format(project.startDate, 'MMM d, yyyy')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaClock className="w-5 h-5 text-gray-400" />
+                      <span className="text-sm text-gray-400">End: {format(project.endDate, 'MMM d, yyyy')}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredProjects.length === 0 && (
