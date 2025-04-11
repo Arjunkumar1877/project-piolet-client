@@ -12,7 +12,7 @@ import { useGetMembers } from '@/src/api/query';
 import { TeamMember } from '@/src/types/project';
 import { useProject } from '@/src/api/mutations';
 import { useAuthStore } from '@/src/store/useAuthStore';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 
 const projectSchema = z.object({
   projectName: z.string().min(1, 'Project name is required'),
@@ -41,7 +41,7 @@ export default function AddProjectPage() {
   const user = useAuthStore((state) => state.user);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamMembers, setTeamMembers] = useState<Array<{
-    _id: any; name: string; role: string; email: string 
+    _id: string; name: string; role: string; email: string 
   }>>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
 

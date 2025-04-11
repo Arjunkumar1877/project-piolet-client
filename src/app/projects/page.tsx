@@ -48,7 +48,7 @@ export default function ProjectsPage() {
   const user = useAuthStore((state) => state.user);
   const { data: projects, isLoading } = useGetProjects({ userId: user?._id || '' });
   console.log(projects)
-const allProjects: Project[] = projects || []
+  const allProjects: Project[] = projects || []
 
   const filteredProjects = allProjects.filter(project => {
     const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -103,7 +103,7 @@ const allProjects: Project[] = projects || []
       toast.success('Member added successfully!');
       setShowAddMember(false);
       reset();
-    } catch (error) {
+    } catch {
       toast.error('Failed to add member. Please try again.');
     }
   };
