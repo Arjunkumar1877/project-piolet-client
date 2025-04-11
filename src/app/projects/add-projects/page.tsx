@@ -6,13 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  FaArrowLeft, 
-  FaPlus
-} from 'react-icons/fa';
+import { FaArrowLeft, FaPlus } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { useGetMembers } from '@/src/api/query';
+import { TeamMember } from '@/src/types/project';
+import { useProject } from '@/src/api/mutations';
+import { useAuthStore } from '@/src/store/useAuthStore';
+import { format } from 'date-fns';
 
-// Define the form schema with Zod
 const projectSchema = z.object({
   projectName: z.string().min(1, 'Project name is required'),
   description: z.string().min(1, 'Description is required'),
@@ -37,9 +38,16 @@ type ProjectFormData = z.infer<typeof projectSchema>;
 
 export default function AddProjectPage() {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [teamMembers, setTeamMembers] = useState<Array<{ name: string; role: string; email: string }>>([]);
-  const [newMember, setNewMember] = useState({ name: '', role: '', email: '' });
+  const [teamMembers, setTeamMembers] = useState<Array<{
+    _id: string; name: string; role: string; email: string 
+  }>>([]);
+  const [selectedMember, setSelectedMember] = useState<string>('');
+
+  const { data: members, isLoading } = useGetMembers({ userId: user?._id || '' });
+
+  const availableTeamMembers = members || [];
 
   const {
     register,
@@ -66,10 +74,13 @@ export default function AddProjectPage() {
   });
 
   const addTeamMember = () => {
-    if (newMember.name && newMember.role && newMember.email) {
-      setTeamMembers([...teamMembers, newMember]);
-      setValue('teamMembers', [...teamMembers, newMember]);
-      setNewMember({ name: '', role: '', email: '' });
+    if (selectedMember) {
+      const member = availableTeamMembers.find((m: TeamMember) => m.name === selectedMember);
+      if (member && !teamMembers.some(m => m.name === member.name)) {
+        setTeamMembers([...teamMembers, member]);
+        setValue('teamMembers', [...teamMembers, member]);
+        setSelectedMember('');
+      }
     }
   };
 
@@ -79,15 +90,31 @@ export default function AddProjectPage() {
     setValue('teamMembers', updatedMembers);
   };
 
-  const onSubmit = async () => {
+  const Project = useProject();
+
+  const onSubmit = async (data: ProjectFormData) => {
+    if (!user?._id) {
+      toast.error('Please wait while we initialize your session');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const transformedData = {
+        ...data,
+        userId: user._id,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        teamMembers: teamMembers.map(member => member._id)
+      };
+      
+      const result = await Project.mutateAsync(transformedData);
+      console.log('API response:', result);
+      
       toast.success('Project created successfully!');
       router.push('/projects');
     } catch (error) {
-      console.log(error)
+      console.error('Error creating project:', error);
       toast.error('Failed to create project. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -173,7 +200,7 @@ export default function AddProjectPage() {
                   placeholder="Enter client name"
                 />
                 {errors.clientName && (
-                  <p className="mt-1 text-sm text-red-400">{errors.clientName.message}</p>
+                  <p className="mt AGN-1 text-sm text-red-400">{errors.clientName.message}</p>
                 )}
               </div>
               <div>
@@ -232,6 +259,8 @@ export default function AddProjectPage() {
                   {...register('startDate')}
                   type="date"
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                  min={format(new Date(), 'yyyy-MM-dd')}
+                  defaultValue={format(new Date(), 'yyyy-MM-dd')}
                 />
                 {errors.startDate && (
                   <p className="mt-1 text-sm text-red-400">{errors.startDate.message}</p>
@@ -245,6 +274,8 @@ export default function AddProjectPage() {
                   {...register('endDate')}
                   type="date"
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                  min={format(new Date(), 'yyyy-MM-dd')}
+                  defaultValue={format(new Date(), 'yyyy-MM-dd')}
                 />
                 {errors.endDate && (
                   <p className="mt-1 text-sm text-red-400">{errors.endDate.message}</p>
@@ -253,59 +284,106 @@ export default function AddProjectPage() {
             </div>
           </div>
 
-          {/* Team Members Section */}
+          {/* Project Budget and Priority Section */}
           <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Team Members</h2>
-              <button
-                type="button"
-                onClick={addTeamMember}
-                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-              >
-                <FaPlus className="w-4 h-4" />
-                Add Member
-              </button>
+            <h2 className="text-xl font-semibold text-white mb-6">Project Budget & Priority</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="budget" className="block text-sm font-medium text-gray-300 mb-2">
+                  Budget
+                </label>
+                <input
+                  {...register('budget')}
+                  type="text"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  placeholder="Enter project budget"
+                />
+                {errors.budget && (
+                  <p className="mt-1 text-sm text-red-400">{errors.budget.message}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="priority" className="block text-sm font-medium text-gray-300 mb-2">
+                  Priority
+                </label>
+                <select
+                  {...register('priority')}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+                {errors.priority && (
+                  <p className="mt-1 text-sm text-red-400">{errors.priority.message}</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-4">
-              {teamMembers.map((member, index) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-800/80 rounded-lg border border-gray-700/50">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      value={member.name}
-                      onChange={(e) => {
-                        const updatedMembers = teamMembers.map((m, i) =>
-                          i === index ? { ...m, name: e.target.value } : m
-                        );
-                        setTeamMembers(updatedMembers);
-                        setValue('teamMembers', updatedMembers);
-                      }}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                      placeholder="Enter member name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Role
-                    </label>
-                    <input
-                      type="text"
-                      value={member.role}
-                      onChange={(e) => {
-                        const updatedMembers = teamMembers.map((m, i) =>
-                          i === index ? { ...m, role: e.target.value } : m
-                        );
-                        setTeamMembers(updatedMembers);
-                        setValue('teamMembers', updatedMembers);
-                      }}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                      placeholder="Enter member role"
-                    />
-                  </div>
-                  <div className="flex items-end">
+          </div>
+
+          {/* Project Notes Section */}
+          <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+            <h2 className="text-xl font-semibold text-white mb-6">Additional Notes</h2>
+            <div>
+              <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-2">
+                Notes
+              </label>
+              <textarea
+                {...register('notes')}
+                rows={4}
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                placeholder="Enter any additional notes about the project"
+              />
+              {errors.notes && (
+                <p className="mt-1 text-sm text-red-400">{errors.notes.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Team Members Section */}
+          {!user?._id ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+            </div>
+          ) : isLoading ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+            </div>
+          ) : (
+            <div className="bg Deprecated-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-white">Team Members</h2>
+                <div className="flex items-center gap-4">
+                  <select
+                    value={selectedMember}
+                    onChange={(e) => setSelectedMember(e.target.value)}
+                    className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                  >
+                    <option value="">Select a team member</option>
+                    {availableTeamMembers.map((member: TeamMember) => (
+                      <option key={member.email} value={member.name}>
+                        {member.name} - {member.role}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={addTeamMember}
+                    className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                  >
+                    <FaPlus className="w-4 h-4" />
+                    Add Member
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {teamMembers.map((member, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-800/80 rounded-lg border border-gray-700/50">
+                    <div>
+                      <p className="text-white font-medium">{member.name}</p>
+                      <p className="text-gray-400 text-sm">{member.role}</p>
+                      <p className="text-gray-400 text-sm">{member.email}</p>
+                    </div>
                     <button
                       type="button"
                       onClick={() => removeTeamMember(index)}
@@ -314,16 +392,16 @@ export default function AddProjectPage() {
                       Remove
                     </button>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Submit Button */}
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !user?._id}
               className="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
@@ -343,4 +421,4 @@ export default function AddProjectPage() {
       </div>
     </div>
   );
-} 
+}
