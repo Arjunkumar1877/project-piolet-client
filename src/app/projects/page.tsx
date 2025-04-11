@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  FaPlus, 
-  FaCalendarAlt, 
-  FaUsers, 
-  FaClock, 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  FaPlus,
+  FaCalendarAlt,
+  FaUsers,
+  FaClock,
   FaExclamationCircle,
   FaSearch,
   FaFilter,
@@ -15,58 +18,73 @@ import {
   FaArrowRight,
   FaCheckCircle,
   FaCircle,
+  FaUserPlus,
+  FaTimes,
 } from 'react-icons/fa';
 import Link from 'next/link';
 import { Project } from '@/src/types/project';
 import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useAddMembers } from '@/src/api/mutations';
+import toast from 'react-hot-toast';
 
+const memberSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  role: z.enum(['UI/UX Designer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Project Manager', 'QA Engineer', 'DevOps Engineer', 'Product Manager'], {
+    required_error: 'Please select a role',
+  }),
+  email: z.string().email('Invalid email address'),
+});
+
+type MemberFormData = z.infer<typeof memberSchema>;
 
 const mockProjects: Project[] = [
-{
-  id: '1',
-  projectName: 'E-commerce Website Development',
-  description: 'Building a modern e-commerce platform with React and Node.js',
-  clientName: 'Tech Retail Co.',
-  clientEmail: 'contact@techretail.com',
-  clientPhone: '+1 (555) 123-4567',
-  clientAddress: '123 Business Ave, Suite 100, San Francisco, CA 94105',
-  startDate: new Date('2024-03-01'),
-  endDate: new Date('2024-06-30'),
-  status: 'active',
-  tasks: {
-    total: 25,
-    completed: 12,
+  {
+    id: '1',
+    projectName: 'E-commerce Website Development',
+    description: 'Building a modern e-commerce platform with React and Node.js',
+    clientName: 'Tech Retail Co.',
+    clientEmail: 'contact@techretail.com',
+    clientPhone: '+1 (555) 123-4567',
+    clientAddress: '123 Business Ave, Suite 100, San Francisco, CA 94105',
+    startDate: new Date('2024-03-01'),
+    endDate: new Date('2024-06-30'),
+    status: 'active',
+    tasks: {
+      total: 25,
+      completed: 12,
+    },
+    members: [
+      { name: 'Alice Johnson', role: 'Project Manager', email: 'alice@techretail.com' },
+      { name: 'Bob Smith', role: 'Lead Developer', email: 'bob@techretail.com' }
+    ]
   },
-  members: [
-    { name: 'Alice Johnson', role: 'Project Manager', email: 'alice@techretail.com' },
-    { name: 'Bob Smith', role: 'Lead Developer', email: 'bob@techretail.com' }
-  ]
-},
-{
-  id: '2',
-  projectName: 'Mobile Banking App',
-  description: 'Developing a secure mobile banking application for iOS and Android',
-  clientName: 'FinTech Solutions',
-  clientEmail: 'projects@fintechsolutions.com',
-  clientPhone: '+1 (555) 987-6543',
-  clientAddress: '456 Finance Street, New York, NY 10001',
-  startDate: new Date('2024-02-15'),
-  endDate: new Date('2024-08-15'),
-  status: 'active',
-  tasks: {
-    total: 40,
-    completed: 18,
-  },
-  members: [
-    { name: 'Charlie Davis', role: 'Mobile Developer', email: 'charlie@fintech.com' },
-    { name: 'Diana Prince', role: 'QA Engineer', email: 'diana@fintech.com' }
-  ]
-}
+  {
+    id: '2',
+    projectName: 'Mobile Banking App',
+    description: 'Developing a secure mobile banking application for iOS and Android',
+    clientName: 'FinTech Solutions',
+    clientEmail: 'projects@fintechsolutions.com',
+    clientPhone: '+1 (555) 987-6543',
+    clientAddress: '456 Finance Street, New York, NY 10001',
+    startDate: new Date('2024-02-15'),
+    endDate: new Date('2024-08-15'),
+    status: 'active',
+    tasks: {
+      total: 40,
+      completed: 18,
+    },
+    members: [
+      { name: 'Charlie Davis', role: 'Mobile Developer', email: 'charlie@fintech.com' },
+      { name: 'Diana Prince', role: 'QA Engineer', email: 'diana@fintech.com' }
+    ]
+  }
 ];
 
 export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showAddMember, setShowAddMember] = useState(false);
   const filteredProjects = mockProjects.filter(project => {
     const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
@@ -99,6 +117,28 @@ export default function ProjectsPage() {
     }
   };
   const router = useRouter();
+ const addMember = useAddMembers()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<MemberFormData>({
+    resolver: zodResolver(memberSchema),
+  });
+
+  const handleAddMember = async (data: MemberFormData) => {
+    try {
+      await addMember.mutateAsync(data);
+      toast.success('Member added successfully!');
+      setShowAddMember(false);
+      reset();
+    } catch (error) {
+      toast.error('Failed to add member. Please try again.');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header Section */}
@@ -107,10 +147,19 @@ export default function ProjectsPage() {
           <h1 className="text-3xl font-bold text-white">Projects</h1>
           <p className="text-gray-400 mt-1">Manage and track your projects</p>
         </div>
-        <button onClick={() => router.push('/projects/add-projects')} className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
-          <FaPlus className="w-5 h-5 mr-2" />
-          New Project
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowAddMember(true)}
+            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
+          >
+            <FaUserPlus className="w-5 h-5 mr-2" />
+            Add Member
+          </button>
+          <button onClick={() => router.push('/projects/add-projects')} className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+            <FaPlus className="w-5 h-5 mr-2" />
+            New Project
+          </button>
+        </div>
       </div>
 
       {/* Search and Filter Section */}
@@ -143,8 +192,8 @@ export default function ProjectsPage() {
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredProjects.map((project) => (
-          <Link 
-            key={project.id} 
+          <Link
+            key={project.id}
             href={`/projects/${project.id}`}
             className="group block"
           >
@@ -239,6 +288,97 @@ export default function ProjectsPage() {
           <p className="text-gray-400">Try adjusting your search or filter criteria</p>
         </div>
       )}
+
+
+      <AnimatePresence>
+        {showAddMember && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold text-white">Add Team Member</h2>
+                <button
+                  onClick={() => setShowAddMember(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <FaTimes className="w-5 h-5" />
+                </button>
+              </div>
+              <form onSubmit={handleSubmit(handleAddMember)} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                  <input
+                    {...register('name')}
+                    type="text"
+                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                    placeholder="Enter member name"
+                  />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Role</label>
+                  <select
+                    {...register('role')}
+                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  >
+                    <option value="">Select a role</option>
+                    <option value="UI/UX Designer">UI/UX Designer</option>
+                    <option value="Frontend Developer">Frontend Developer</option>
+                    <option value="Backend Developer">Backend Developer</option>
+                    <option value="Full Stack Developer">Full Stack Developer</option>
+                    <option value="Project Manager">Project Manager</option>
+                    <option value="QA Engineer">QA Engineer</option>
+                    <option value="DevOps Engineer">DevOps Engineer</option>
+                    <option value="Product Manager">Product Manager</option>
+                  </select>
+                  {errors.role && (
+                    <p className="mt-1 text-sm text-red-400">{errors.role.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                  <input
+                    {...register('email')}
+                    type="email"
+                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                    placeholder="Enter member email"
+                  />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+                  )}
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="submit"
+                    disabled={addMember.isPending}
+                    className="flex-1 bg-teal-600 text-white py-2.5 px-4 rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {addMember.isPending ? 'Adding...' : 'Add Member'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddMember(false)}
+                    className="flex-1 bg-gray-700 text-white py-2.5 px-4 rounded-lg hover:bg-gray-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

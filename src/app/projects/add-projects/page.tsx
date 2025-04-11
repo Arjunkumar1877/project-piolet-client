@@ -12,7 +12,6 @@ import {
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
-// Define the form schema with Zod
 const projectSchema = z.object({
   projectName: z.string().min(1, 'Project name is required'),
   description: z.string().min(1, 'Description is required'),
@@ -39,7 +38,13 @@ export default function AddProjectPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamMembers, setTeamMembers] = useState<Array<{ name: string; role: string; email: string }>>([]);
-  const [newMember, setNewMember] = useState({ name: '', role: '', email: '' });
+  const [selectedMember, setSelectedMember] = useState<string>('');
+
+  const availableTeamMembers = [
+    { name: 'John Doe', role: 'Developer', email: 'john@example.com' },
+    { name: 'Jane Smith', role: 'Designer', email: 'jane@example.com' },
+    { name: 'Mike Johnson', role: 'Project Manager', email: 'mike@example.com' },
+  ];
 
   const {
     register,
@@ -66,10 +71,13 @@ export default function AddProjectPage() {
   });
 
   const addTeamMember = () => {
-    if (newMember.name && newMember.role && newMember.email) {
-      setTeamMembers([...teamMembers, newMember]);
-      setValue('teamMembers', [...teamMembers, newMember]);
-      setNewMember({ name: '', role: '', email: '' });
+    if (selectedMember) {
+      const member = availableTeamMembers.find(m => m.name === selectedMember);
+      if (member && !teamMembers.some(m => m.name === member.name)) {
+        setTeamMembers([...teamMembers, member]);
+        setValue('teamMembers', [...teamMembers, member]);
+        setSelectedMember('');
+      }
     }
   };
 
@@ -257,63 +265,44 @@ export default function AddProjectPage() {
           <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">Team Members</h2>
-              <button
-                type="button"
-                onClick={addTeamMember}
-                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-              >
-                <FaPlus className="w-4 h-4" />
-                Add Member
-              </button>
+              <div className="flex items-center gap-4">
+                <select
+                  value={selectedMember}
+                  onChange={(e) => setSelectedMember(e.target.value)}
+                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                >
+                  <option value="">Select a team member</option>
+                  {availableTeamMembers.map((member) => (
+                    <option key={member.email} value={member.name}>
+                      {member.name} - {member.role}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={addTeamMember}
+                  className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                >
+                  <FaPlus className="w-4 h-4" />
+                  Add Member
+                </button>
+              </div>
             </div>
             <div className="space-y-4">
               {teamMembers.map((member, index) => (
-                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-800/80 rounded-lg border border-gray-700/50">
+                <div key={index} className="flex items-center justify-between p-4 bg-gray-800/80 rounded-lg border border-gray-700/50">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      value={member.name}
-                      onChange={(e) => {
-                        const updatedMembers = teamMembers.map((m, i) =>
-                          i === index ? { ...m, name: e.target.value } : m
-                        );
-                        setTeamMembers(updatedMembers);
-                        setValue('teamMembers', updatedMembers);
-                      }}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                      placeholder="Enter member name"
-                    />
+                    <p className="text-white font-medium">{member.name}</p>
+                    <p className="text-gray-400 text-sm">{member.role}</p>
+                    <p className="text-gray-400 text-sm">{member.email}</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Role
-                    </label>
-                    <input
-                      type="text"
-                      value={member.role}
-                      onChange={(e) => {
-                        const updatedMembers = teamMembers.map((m, i) =>
-                          i === index ? { ...m, role: e.target.value } : m
-                        );
-                        setTeamMembers(updatedMembers);
-                        setValue('teamMembers', updatedMembers);
-                      }}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                      placeholder="Enter member role"
-                    />
-                  </div>
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={() => removeTeamMember(index)}
-                      className="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
-                    >
-                      Remove
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeTeamMember(index)}
+                    className="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
             </div>

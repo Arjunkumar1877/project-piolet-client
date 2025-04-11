@@ -47,3 +47,31 @@ export function useLogin() {
 
   return mutation
 }
+
+
+
+
+
+
+
+export function useAddMembers() {
+  const mutation = useMutation({
+    mutationFn: async ({ name, role, email }: { name: string; role: string; email: string }) => {
+        const response = await api.post('/projects/team-members', {
+            name, role, email
+        })
+        return response.data
+
+    },
+    onSuccess: (data) => {
+      console.log('saved member successful', data)
+    },
+    onError: (error: Error) => {
+      console.error('saved member failed:', error.message)
+    },
+  })
+
+  return mutation
+}
+
+
