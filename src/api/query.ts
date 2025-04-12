@@ -34,3 +34,20 @@ import { Project, TeamMember } from '../types/project';
       enabled: !!userId,
     });
   }
+
+
+
+
+  export function useGetProjectsDetails({ projectId }: { projectId: string }) {
+    return useQuery<Project>({
+      queryKey: ['team-project', projectId],
+      queryFn: async () => {
+        if (!projectId) {
+          throw new Error('User ID is required');
+        }
+        const response = await api.get(`/projects/details/${projectId}`);
+        return response.data;
+      },
+      enabled: !!projectId,
+    });
+  }

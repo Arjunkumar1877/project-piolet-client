@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  FaPlus, 
-  FaCalendarAlt, 
-  FaClock, 
-  FaExclamationCircle, 
+import {
+  FaPlus,
+  FaCalendarAlt,
+  FaClock,
+  FaExclamationCircle,
   FaBuilding,
   FaEnvelope,
   FaPhone,
@@ -24,271 +24,23 @@ import {
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useGetProjectsDetails } from '@/src/api/query';
+import { Project, ProjectDetails } from '@/src/types/project';
+import { format } from 'date-fns';
 
-// Define types
-interface Member {
-  name: string;
-  role: string;
-  email: string;
-}
-
-interface Project {
-  id: string;
-  projectName: string;
-  description: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  clientAddress: string;
-  startDate: Date;
-  endDate: Date;
-  status: 'active' | 'completed' | 'on-hold';
-  tasks: {
-    total: number;
-    completed: number;
-  };
-  members: Member[];
-}
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'todo';
-  priority: 'high' | 'medium' | 'low';
-  dueDate: Date;
-  assignedTo: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-
-// Mock projects data
-const mockProjects: Project[] = [
-  // ... (keeping all your original mockProjects data)
-  {
-    id: '1',
-    projectName: 'E-commerce Platform Redesign',
-    description: 'Modernize the existing e-commerce platform with improved UX and new features',
-    clientName: 'TechCorp Inc.',
-    clientEmail: 'contact@techcorp.com',
-    clientPhone: '+1 (555) 123-4567',
-    clientAddress: '123 Tech Street, Silicon Valley, CA 94025',
-    startDate: new Date('2024-03-01'),
-    endDate: new Date('2024-06-30'),
-    status: 'active',
-    tasks: {
-      total: 12,
-      completed: 5
-    },
-    members: [
-      {
-        name: 'John Doe',
-        role: 'Project Manager',
-        email: 'john@example.com'
-      },
-      {
-        name: 'Jane Smith',
-        role: 'UI Designer',
-        email: 'jane@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      }
-    ]
-  },
-  {
-    id: '2',
-    projectName: 'Mobile Banking App',
-    description: 'Develop a secure and user-friendly mobile banking application',
-    clientName: 'SecureBank',
-    clientEmail: 'projects@securebank.com',
-    clientPhone: '+1 (555) 987-6543',
-    clientAddress: '456 Finance Ave, New York, NY 10001',
-    startDate: new Date('2024-02-15'),
-    endDate: new Date('2024-08-15'),
-    status: 'active',
-    tasks: {
-      total: 8,
-      completed: 2
-    },
-    members: [
-      {
-        name: 'John Doe',
-        role: 'Project Manager',
-        email: 'john@example.com'
-      },
-      {
-        name: 'Jane Smith',
-        role: 'UI Designer',
-        email: 'jane@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      }
-    ]
-  },
-  {
-    id: '3',
-    projectName: 'Healthcare Management System',
-    description: 'Create a comprehensive healthcare management system for hospitals',
-    clientName: 'HealthCare Plus',
-    clientEmail: 'it@healthcareplus.com',
-    clientPhone: '+1 (555) 456-7890',
-    clientAddress: '789 Medical Center Blvd, Chicago, IL 60601',
-    startDate: new Date('2024-01-10'),
-    endDate: new Date('2024-12-31'),
-    status: 'active',
-    tasks: {
-      total: 15,
-      completed: 7
-    },
-    members: [
-      {
-        name: 'Alex Davis',
-        role: 'System Architect',
-        email: 'alex@example.com'
-      },
-      {
-        name: 'Emma Wilson',
-        role: 'UI/UX Designer',
-        email: 'emma@example.com'
-      }
-    ]
-  }
-];
-
-// Mock tasks data
-const mockTasks: Record<string, Task[]> = {
-  // ... (keeping all your original mockTasks data)
-  '1': [
-    {
-      id: '1-1',
-      title: 'Design User Interface',
-      description: 'Create wireframes and mockups for the e-commerce platform',
-      status: 'completed',
-      priority: 'high',
-      dueDate: new Date('2024-03-15'),
-      assignedTo: 'Jane Smith',
-      createdAt: new Date('2024-03-01'),
-      updatedAt: new Date('2024-03-15')
-    },
-    {
-      id: '1-2',
-      title: 'Implement Authentication',
-      description: 'Set up user authentication and authorization system',
-      status: 'in-progress',
-      priority: 'high',
-      dueDate: new Date('2024-03-25'),
-      assignedTo: 'Mike Johnson',
-      createdAt: new Date('2024-03-05'),
-      updatedAt: new Date('2024-03-18')
-    },
-    {
-      id: '1-3',
-      title: 'Product Catalog',
-      description: 'Create product listing and detail pages',
-      status: 'todo',
-      priority: 'medium',
-      dueDate: new Date('2024-04-05'),
-      assignedTo: 'Mike Johnson',
-      createdAt: new Date('2024-03-10'),
-      updatedAt: new Date('2024-03-10')
-    }
-  ],
-  '2': [
-    {
-      id: '2-1',
-      title: 'Security Implementation',
-      description: 'Implement bank-grade security measures',
-      status: 'in-progress',
-      priority: 'high',
-      dueDate: new Date('2024-04-15'),
-      assignedTo: 'Sarah Wilson',
-      createdAt: new Date('2024-02-20'),
-      updatedAt: new Date('2024-03-18')
-    },
-    {
-      id: '2-2',
-      title: 'API Development',
-      description: 'Develop RESTful APIs for mobile app',
-      status: 'todo',
-      priority: 'high',
-      dueDate: new Date('2024-05-01'),
-      assignedTo: 'Tom Brown',
-      createdAt: new Date('2024-02-25'),
-      updatedAt: new Date('2024-02-25')
-    }
-  ],
-  '3': [
-    {
-      id: '3-1',
-      title: 'Database Schema',
-      description: 'Design and implement healthcare database schema',
-      status: 'completed',
-      priority: 'high',
-      dueDate: new Date('2024-02-15'),
-      assignedTo: 'Alex Davis',
-      createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-02-15')
-    },
-    {
-      id: '3-2',
-      title: 'Patient Portal',
-      description: 'Create patient portal interface',
-      status: 'todo',
-      priority: 'medium',
-      dueDate: new Date('2024-04-30'),
-      assignedTo: 'Emma Wilson',
-      createdAt: new Date('2024-01-20'),
-      updatedAt: new Date('2024-03-01')
-    }
-  ]
-};
 
 
 export default function ProjectDetailsPage() {
-  
+
   const { id } = useParams();
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddMember, setShowAddMember] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  
-  const project = mockProjects.find((p: Project) => p.id === id);
-  const tasks = mockTasks[id as string] || [];
+  const { data: projectDetails } = useGetProjectsDetails({ projectId: id as string });
 
+  const project: ProjectDetails = projectDetails as ProjectDetails;
 
-  const filteredTasks = tasks.filter((task: Task) => {
-    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         task.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
 
 
   if (!project) {
@@ -360,8 +112,8 @@ export default function ProjectDetailsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Link 
-          href="/projects" 
+        <Link
+          href="/projects"
           className="inline-flex items-center text-gray-400 hover:text-teal-400 mb-6 group transition-colors"
         >
           <FaArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -381,14 +133,14 @@ export default function ProjectDetailsPage() {
               <p className="text-gray-400 mt-2 text-lg">{project.description}</p>
             </div>
             <div className="flex items-center gap-3">
-              <button 
+              <button
                 onClick={() => setShowAddMember(true)}
                 className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
               >
                 <FaUserPlus className="w-5 h-5 mr-2" />
                 Add Member
               </button>
-              <button 
+              <button
                 onClick={() => setShowAddTask(true)}
                 className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
               >
@@ -442,14 +194,14 @@ export default function ProjectDetailsPage() {
               <FaCalendarAlt className="w-5 h-5 text-teal-400" />
               <div>
                 <p className="text-gray-400">Start Date</p>
-                <p className="font-medium text-white">{project.startDate.toLocaleDateString()}</p>
+                <p className="font-medium text-white">{format(project.startDate, 'MMM d, yyyy')}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 bg-gray-800/80 rounded-lg border border-gray-700/50">
               <FaClock className="w-5 h-5 text-teal-400" />
               <div>
                 <p className="text-gray-400">End Date</p>
-                <p className="font-medium text-white">{project.endDate.toLocaleDateString()}</p>
+                <p className="font-medium text-white">{format(project.endDate, 'MMM d, yyyy')}</p>
               </div>
             </div>
           </div>
@@ -463,13 +215,13 @@ export default function ProjectDetailsPage() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">Team Members</h2>
-                <p className="text-sm text-gray-400">{project.members.length} members in the team</p>
+                <p className="text-sm text-gray-400">{project?.teamMembers?.length} members in the team</p>
               </div>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {project.members.map((member, index) => (
+            {project.teamMembers && project?.teamMembers?.map((member, index) => (
               <motion.div
                 key={member.email}
                 initial={{ opacity: 0, y: 20 }}
@@ -498,9 +250,9 @@ export default function ProjectDetailsPage() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">Tasks</h2>
-                <p className="text-sm text-gray-400">
+                {/* <p className="text-sm text-gray-400">
                   {tasks.filter(t => t.status === 'completed').length} / {tasks.length} completed
-                </p>
+                </p> */}
               </div>
             </div>
           </div>
@@ -530,8 +282,8 @@ export default function ProjectDetailsPage() {
               </select>
             </div>
           </div>
-          
-          <div className="space-y-4">
+
+          {/* <div className="space-y-4">
             {filteredTasks.map((task, index) => (
               <motion.div
                 key={task.id}
@@ -572,9 +324,9 @@ export default function ProjectDetailsPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </div> */}
 
-          {filteredTasks.length === 0 && (
+          {/* {filteredTasks.length === 0 && (
             <div className="text-center py-12">
               <div className="text-gray-400 mb-4">
                 <FaExclamationCircle className="w-12 h-12 mx-auto" />
@@ -582,7 +334,7 @@ export default function ProjectDetailsPage() {
               <h3 className="text-lg font-medium text-white mb-2">No tasks found</h3>
               <p className="text-gray-400">Add a new task to get started</p>
             </div>
-          )}
+          )} */}
         </div>
       </motion.div>
 
@@ -602,7 +354,7 @@ export default function ProjectDetailsPage() {
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-white">Add Team Member</h2>
-                <button 
+                <button
                   onClick={() => setShowAddMember(false)}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
@@ -674,7 +426,7 @@ export default function ProjectDetailsPage() {
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-white">Add New Task</h2>
-                <button 
+                <button
                   onClick={() => setShowAddTask(false)}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
@@ -706,7 +458,7 @@ export default function ProjectDetailsPage() {
                     required
                     className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
                   >
-                    {project.members.map(member => (
+                    {project.teamMembers && project.teamMembers.map(member => (
                       <option key={member.email} value={member.name}>
                         {member.name}
                       </option>
