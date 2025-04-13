@@ -5,14 +5,11 @@ import {
   FaPlus,
   FaCalendarAlt,
   FaClock,
-  FaExclamationCircle,
   FaBuilding,
   FaEnvelope,
   FaPhone,
   FaMapMarkerAlt,
   FaArrowLeft,
-  FaUser,
-  FaFlag,
   FaCheckCircle,
   FaCircle,
   FaUsers,
@@ -25,14 +22,10 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetMembers, useGetProjectsDetails } from '@/src/api/query';
-import { Project, ProjectDetails, TeamMember } from '@/src/types/project';
+import {  ProjectDetails, TeamMember } from '@/src/types/project';
 import { format } from 'date-fns';
 import { useAuthStore } from '@/src/store/useAuthStore';
-import { useAddMembers, useAddMembersInProject } from '@/src/api/mutations';
-import { MemberFormData, memberSchema } from '@/src/form/form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import toast from 'react-hot-toast';
+import {  useAddMembersInProject } from '@/src/api/mutations';
 
 
 
@@ -99,18 +92,18 @@ export default function ProjectDetailsPage() {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'text-red-400';
-      case 'medium':
-        return 'text-amber-400';
-      case 'low':
-        return 'text-emerald-400';
-      default:
-        return 'text-gray-400';
-    }
-  };
+  // const getPriorityColor = (priority: string) => {
+  //   switch (priority) {
+  //     case 'high':
+  //       return 'text-red-400';
+  //     case 'medium':
+  //       return 'text-amber-400';
+  //     case 'low':
+  //       return 'text-emerald-400';
+  //     default:
+  //       return 'text-gray-400';
+  //   }
+  // };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
