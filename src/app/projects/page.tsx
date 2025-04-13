@@ -30,15 +30,7 @@ import toast from 'react-hot-toast';
 import { useAuthStore } from '@/src/store/useAuthStore';
 import { useGetProjects } from '@/src/api/query';
 import { format } from 'date-fns';
-
-const memberSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  role: z.enum(['UI/UX Designer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Project Manager', 'QA Engineer', 'DevOps Engineer', 'Product Manager'], {
-    required_error: 'Please select a role',
-  }),
-  email: z.string().email('Invalid email address'),
-});
-type MemberFormData = z.infer<typeof memberSchema>;
+import { MemberFormData, memberSchema } from '@/src/form/form';
 
 
 export default function ProjectsPage() {
@@ -47,7 +39,6 @@ export default function ProjectsPage() {
   const [showAddMember, setShowAddMember] = useState(false);
   const user = useAuthStore((state) => state.user);
   const { data: projects, isLoading } = useGetProjects({ userId: user?._id || '' });
-  console.log(projects)
   const allProjects: Project[] = projects || []
 
   const filteredProjects = allProjects.filter(project => {

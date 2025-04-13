@@ -58,7 +58,7 @@ export function useLogin() {
 export function useAddMembers() {
   const mutation = useMutation({
     mutationFn: async ({ name, role, email , userId}: { name: string; role: string; email: string , userId: string }) => {
-        const response = await api.post('/projects/team-members', {
+        const response = await api.post('/team-members', {
             name, role, email, userId
         })
         return response.data
@@ -77,12 +77,35 @@ export function useAddMembers() {
 
 
 
+export function useAddMembersInProject() {
+  const mutation = useMutation({
+    mutationFn: async (args: { memberId: string[], projectId: string }) => {
+      const { memberId, projectId } = args;
+        const response = await api.post('/team-members/add-to-project', {
+          projectId: projectId,
+          teamMemberIds: memberId
+        })
+        return response.data
+
+    },
+    onSuccess: (data) => {
+      console.log('saved member to the project successful', data)
+    },
+    onError: (error: Error) => {
+      console.error('saving member to the project failed:', error.message)
+    },
+  })
+
+  return mutation
+}
 
 
 
 
 
-export function useProject() {
+
+
+export function useAddProject() {
   const mutation = useMutation({
     mutationFn: async (data: Project) => {
       const response = await api.post('/projects', data);
@@ -100,7 +123,23 @@ export function useProject() {
   return mutation
 }
 
+export function useEditProject() {
+  const mutation = useMutation({
+    mutationFn: async (data: Project) => {
+      const response = await api.patch('/projects', data);
+        return response.data
 
+    },
+    onSuccess: (data) => {
+      console.log('saved member successful', data)
+    },
+    onError: (error: Error) => {
+      console.error('saved member failed:', error.message)
+    },
+  })
+
+  return mutation
+}
 
 
 

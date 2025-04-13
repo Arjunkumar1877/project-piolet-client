@@ -24,9 +24,15 @@ import {
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetProjectsDetails } from '@/src/api/query';
-import { Project, ProjectDetails } from '@/src/types/project';
+import { useGetMembers, useGetProjectsDetails } from '@/src/api/query';
+import { Project, ProjectDetails, TeamMember } from '@/src/types/project';
 import { format } from 'date-fns';
+import { useAuthStore } from '@/src/store/useAuthStore';
+import { useAddMembers, useAddMembersInProject } from '@/src/api/mutations';
+import { MemberFormData, memberSchema } from '@/src/form/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
 
 
 
@@ -34,14 +40,38 @@ export default function ProjectDetailsPage() {
 
   const { id } = useParams();
   const [showAddTask, setShowAddTask] = useState(false);
-  const [showAddMember, setShowAddMember] = useState(false);
+  const [showAddNewMember, setShowAddNewMember] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { data: projectDetails } = useGetProjectsDetails({ projectId: id as string });
-
+  const user = useAuthStore((state) => state.user)
   const project: ProjectDetails = projectDetails as ProjectDetails;
+  const [teamMembers, setTeamMembers] = useState<Array<{
+    _id: string; name: string; role: string; email: string
+  }>>([]);
+  const [selectedMember, setSelectedMember] = useState<string>('');
+
+  const { data: availableTeamMembers, isLoading: isMembersLoading } = useGetMembers({ userId: user?._id || '' });
+  const addMembersToProject = useAddMembersInProject()
+
+  
 
 
+
+  const addTeamMember = () => {
+    if (selectedMember) {
+      const member = availableTeamMembers?.find((m: TeamMember) => m.name === selectedMember);
+      if (member && !teamMembers.some(m => m.name === member.name)) {
+        setTeamMembers([...teamMembers, member]);
+        setSelectedMember('');
+      }
+    }
+  };
+
+  const removeTeamMember = (index: number) => {
+    const updatedMembers = teamMembers.filter((_, i) => i !== index);
+    setTeamMembers(updatedMembers);
+  };
 
   if (!project) {
     return (
@@ -95,15 +125,28 @@ export default function ProjectDetailsPage() {
     }
   };
 
-  const handleAddMember = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setShowAddMember(false);
+  const handleUpdateTeamMembers = () => {
+    try {
+      const response = addMembersToProject.mutateAsync({
+        memberId: teamMembers.map((member) => member._id) as string[],
+        projectId: id as string
+      })
+
+      console.log(response);
+    } catch (error) {
+      console.error(error)
+    }
   };
+
 
   const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setShowAddTask(false);
   };
+
+  const filteredMembers = availableTeamMembers?.filter((member) => 
+    !projectDetails?.teamMembers?.some((item) => item?._id === member._id)
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -134,7 +177,7 @@ export default function ProjectDetailsPage() {
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setShowAddMember(true)}
+                onClick={() => setShowAddNewMember(true)}
                 className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
               >
                 <FaUserPlus className="w-5 h-5 mr-2" />
@@ -230,12 +273,12 @@ export default function ProjectDetailsPage() {
                 className="flex items-center gap-4 p-4 bg-gray-800/80 rounded-lg border border-gray-700/50 hover:border-gray-600/50 transition-all duration-200"
               >
                 <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center">
-                  <span className="text-teal-400 font-medium">{member.name.charAt(0).toUpperCase()}</span>
+                  <span className="text-teal-400 font-medium">{member?.name?.charAt(0).toUpperCase()}</span>
                 </div>
                 <div>
-                  <h3 className="font-medium text-white">{member.name}</h3>
-                  <p className="text-sm text-gray-400">{member.role}</p>
-                  <p className="text-xs text-gray-500">{member.email}</p>
+                  <h3 className="font-medium text-white">{member?.name}</h3>
+                  <p className="text-sm text-gray-400">{member?.role}</p>
+                  <p className="text-xs text-gray-500">{member?.email}</p>
                 </div>
               </motion.div>
             ))}
@@ -338,77 +381,102 @@ export default function ProjectDetailsPage() {
         </div>
       </motion.div>
 
+
       <AnimatePresence>
-        {showAddMember && (
+        {showAddNewMember && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm z-50"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50"
+              className="relative bg-gray-800 rounded-xl p-8 w-full max-w-3xl lg:max-w-4xl shadow-2xl border border-gray-700/50"
             >
+              {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-white">Add Team Member</h2>
                 <button
-                  onClick={() => setShowAddMember(false)}
+                  onClick={() => setShowAddNewMember(false)}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <FaTimes className="w-5 h-5" />
                 </button>
               </div>
-              <form onSubmit={handleAddMember} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter member name"
-                  />
+
+              {/* Modal Content */}
+              {!user?._id || isMembersLoading ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Role</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter member role"
-                  />
+              ) : (
+                <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-white">Team Members</h2>
+                    <div className="flex items-center gap-4">
+                      <select
+                        value={selectedMember}
+                        onChange={(e) => setSelectedMember(e.target.value)}
+                        className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                      >
+                        <option value="">Select a team member</option>
+                        {filteredMembers?.map((member) => (
+                          <option key={member.email} value={member.name}>
+                            {member.name} - {member.role}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={addTeamMember}
+                        className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                      >
+                        <FaPlus className="w-4 h-4" />
+                        Add Selected Member
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {teamMembers.map((member, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-4 bg-gray-800/80 rounded-lg border border-gray-700/50"
+                      >
+                        <div>
+                          <p className="text-white font-medium">{member.name}</p>
+                          <p className="text-gray-400 text-sm">{member.role}</p>
+                          <p className="text-gray-400 text-sm">{member.email}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeTeamMember(index)}
+                          className="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                  <input
-                    type="email"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter member email"
-                  />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-teal-600 text-white py-2.5 px-4 rounded-lg hover:bg-teal-700 transition-colors"
-                  >
-                    Add Member
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddMember(false)}
-                    className="flex-1 bg-gray-700 text-white py-2.5 px-4 rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+              )}
+
+              {/* Save Button */}
+              <div className="absolute bottom-4 right-4">
+                <button
+                  onClick={handleUpdateTeamMembers}
+                  className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                >
+                  Save
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
 
       <AnimatePresence>
         {showAddTask && (
