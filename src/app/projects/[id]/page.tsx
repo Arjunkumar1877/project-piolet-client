@@ -1,18 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  FaPlus, 
-  FaCalendarAlt, 
-  FaClock, 
-  FaExclamationCircle, 
+import {
+  FaPlus,
+  FaCalendarAlt,
+  FaClock,
   FaBuilding,
   FaEnvelope,
   FaPhone,
   FaMapMarkerAlt,
   FaArrowLeft,
-  FaUser,
-  FaFlag,
   FaCheckCircle,
   FaCircle,
   FaUsers,
@@ -24,272 +21,50 @@ import {
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useGetMembers, useGetProjectsDetails } from '@/src/api/query';
+import {  ProjectDetails, TeamMember } from '@/src/types/project';
+import { format } from 'date-fns';
+import { useAuthStore } from '@/src/store/useAuthStore';
+import {  useAddMembersInProject } from '@/src/api/mutations';
 
-// Define types
-interface Member {
-  name: string;
-  role: string;
-  email: string;
-}
-
-interface Project {
-  id: string;
-  projectName: string;
-  description: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  clientAddress: string;
-  startDate: Date;
-  endDate: Date;
-  status: 'active' | 'completed' | 'on-hold';
-  tasks: {
-    total: number;
-    completed: number;
-  };
-  members: Member[];
-}
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'todo';
-  priority: 'high' | 'medium' | 'low';
-  dueDate: Date;
-  assignedTo: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-
-// Mock projects data
-const mockProjects: Project[] = [
-  // ... (keeping all your original mockProjects data)
-  {
-    id: '1',
-    projectName: 'E-commerce Platform Redesign',
-    description: 'Modernize the existing e-commerce platform with improved UX and new features',
-    clientName: 'TechCorp Inc.',
-    clientEmail: 'contact@techcorp.com',
-    clientPhone: '+1 (555) 123-4567',
-    clientAddress: '123 Tech Street, Silicon Valley, CA 94025',
-    startDate: new Date('2024-03-01'),
-    endDate: new Date('2024-06-30'),
-    status: 'active',
-    tasks: {
-      total: 12,
-      completed: 5
-    },
-    members: [
-      {
-        name: 'John Doe',
-        role: 'Project Manager',
-        email: 'john@example.com'
-      },
-      {
-        name: 'Jane Smith',
-        role: 'UI Designer',
-        email: 'jane@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      }
-    ]
-  },
-  {
-    id: '2',
-    projectName: 'Mobile Banking App',
-    description: 'Develop a secure and user-friendly mobile banking application',
-    clientName: 'SecureBank',
-    clientEmail: 'projects@securebank.com',
-    clientPhone: '+1 (555) 987-6543',
-    clientAddress: '456 Finance Ave, New York, NY 10001',
-    startDate: new Date('2024-02-15'),
-    endDate: new Date('2024-08-15'),
-    status: 'active',
-    tasks: {
-      total: 8,
-      completed: 2
-    },
-    members: [
-      {
-        name: 'John Doe',
-        role: 'Project Manager',
-        email: 'john@example.com'
-      },
-      {
-        name: 'Jane Smith',
-        role: 'UI Designer',
-        email: 'jane@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      },
-      {
-        name: 'Mike Johnson',
-        role: 'Frontend Developer',
-        email: 'mike@example.com'
-      }
-    ]
-  },
-  {
-    id: '3',
-    projectName: 'Healthcare Management System',
-    description: 'Create a comprehensive healthcare management system for hospitals',
-    clientName: 'HealthCare Plus',
-    clientEmail: 'it@healthcareplus.com',
-    clientPhone: '+1 (555) 456-7890',
-    clientAddress: '789 Medical Center Blvd, Chicago, IL 60601',
-    startDate: new Date('2024-01-10'),
-    endDate: new Date('2024-12-31'),
-    status: 'active',
-    tasks: {
-      total: 15,
-      completed: 7
-    },
-    members: [
-      {
-        name: 'Alex Davis',
-        role: 'System Architect',
-        email: 'alex@example.com'
-      },
-      {
-        name: 'Emma Wilson',
-        role: 'UI/UX Designer',
-        email: 'emma@example.com'
-      }
-    ]
-  }
-];
-
-// Mock tasks data
-const mockTasks: Record<string, Task[]> = {
-  // ... (keeping all your original mockTasks data)
-  '1': [
-    {
-      id: '1-1',
-      title: 'Design User Interface',
-      description: 'Create wireframes and mockups for the e-commerce platform',
-      status: 'completed',
-      priority: 'high',
-      dueDate: new Date('2024-03-15'),
-      assignedTo: 'Jane Smith',
-      createdAt: new Date('2024-03-01'),
-      updatedAt: new Date('2024-03-15')
-    },
-    {
-      id: '1-2',
-      title: 'Implement Authentication',
-      description: 'Set up user authentication and authorization system',
-      status: 'in-progress',
-      priority: 'high',
-      dueDate: new Date('2024-03-25'),
-      assignedTo: 'Mike Johnson',
-      createdAt: new Date('2024-03-05'),
-      updatedAt: new Date('2024-03-18')
-    },
-    {
-      id: '1-3',
-      title: 'Product Catalog',
-      description: 'Create product listing and detail pages',
-      status: 'todo',
-      priority: 'medium',
-      dueDate: new Date('2024-04-05'),
-      assignedTo: 'Mike Johnson',
-      createdAt: new Date('2024-03-10'),
-      updatedAt: new Date('2024-03-10')
-    }
-  ],
-  '2': [
-    {
-      id: '2-1',
-      title: 'Security Implementation',
-      description: 'Implement bank-grade security measures',
-      status: 'in-progress',
-      priority: 'high',
-      dueDate: new Date('2024-04-15'),
-      assignedTo: 'Sarah Wilson',
-      createdAt: new Date('2024-02-20'),
-      updatedAt: new Date('2024-03-18')
-    },
-    {
-      id: '2-2',
-      title: 'API Development',
-      description: 'Develop RESTful APIs for mobile app',
-      status: 'todo',
-      priority: 'high',
-      dueDate: new Date('2024-05-01'),
-      assignedTo: 'Tom Brown',
-      createdAt: new Date('2024-02-25'),
-      updatedAt: new Date('2024-02-25')
-    }
-  ],
-  '3': [
-    {
-      id: '3-1',
-      title: 'Database Schema',
-      description: 'Design and implement healthcare database schema',
-      status: 'completed',
-      priority: 'high',
-      dueDate: new Date('2024-02-15'),
-      assignedTo: 'Alex Davis',
-      createdAt: new Date('2024-01-15'),
-      updatedAt: new Date('2024-02-15')
-    },
-    {
-      id: '3-2',
-      title: 'Patient Portal',
-      description: 'Create patient portal interface',
-      status: 'todo',
-      priority: 'medium',
-      dueDate: new Date('2024-04-30'),
-      assignedTo: 'Emma Wilson',
-      createdAt: new Date('2024-01-20'),
-      updatedAt: new Date('2024-03-01')
-    }
-  ]
-};
 
 
 export default function ProjectDetailsPage() {
-  
+
   const { id } = useParams();
   const [showAddTask, setShowAddTask] = useState(false);
-  const [showAddMember, setShowAddMember] = useState(false);
+  const [showAddNewMember, setShowAddNewMember] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { data: projectDetails } = useGetProjectsDetails({ projectId: id as string });
+  const user = useAuthStore((state) => state.user)
+  const project: ProjectDetails = projectDetails as ProjectDetails;
+  const [teamMembers, setTeamMembers] = useState<Array<{
+    _id: string; name: string; role: string; email: string
+  }>>([]);
+  const [selectedMember, setSelectedMember] = useState<string>('');
+
+  const { data: availableTeamMembers, isLoading: isMembersLoading } = useGetMembers({ userId: user?._id || '' });
+  const addMembersToProject = useAddMembersInProject()
+
   
-  const project = mockProjects.find((p: Project) => p.id === id);
-  const tasks = mockTasks[id as string] || [];
 
 
-  const filteredTasks = tasks.filter((task: Task) => {
-    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         task.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
 
+  const addTeamMember = () => {
+    if (selectedMember) {
+      const member = availableTeamMembers?.find((m: TeamMember) => m.name === selectedMember);
+      if (member && !teamMembers.some(m => m.name === member.name)) {
+        setTeamMembers([...teamMembers, member]);
+        setSelectedMember('');
+      }
+    }
+  };
+
+  const removeTeamMember = (index: number) => {
+    const updatedMembers = teamMembers.filter((_, i) => i !== index);
+    setTeamMembers(updatedMembers);
+  };
 
   if (!project) {
     return (
@@ -317,18 +92,18 @@ export default function ProjectDetailsPage() {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'text-red-400';
-      case 'medium':
-        return 'text-amber-400';
-      case 'low':
-        return 'text-emerald-400';
-      default:
-        return 'text-gray-400';
-    }
-  };
+  // const getPriorityColor = (priority: string) => {
+  //   switch (priority) {
+  //     case 'high':
+  //       return 'text-red-400';
+  //     case 'medium':
+  //       return 'text-amber-400';
+  //     case 'low':
+  //       return 'text-emerald-400';
+  //     default:
+  //       return 'text-gray-400';
+  //   }
+  // };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -343,15 +118,28 @@ export default function ProjectDetailsPage() {
     }
   };
 
-  const handleAddMember = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setShowAddMember(false);
+  const handleUpdateTeamMembers = () => {
+    try {
+      const response = addMembersToProject.mutateAsync({
+        memberId: teamMembers.map((member) => member._id) as string[],
+        projectId: id as string
+      })
+
+      console.log(response);
+    } catch (error) {
+      console.error(error)
+    }
   };
+
 
   const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setShowAddTask(false);
   };
+
+  const filteredMembers = availableTeamMembers?.filter((member) => 
+    !projectDetails?.teamMembers?.some((item) => item?._id === member._id)
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -360,8 +148,8 @@ export default function ProjectDetailsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Link 
-          href="/projects" 
+        <Link
+          href="/projects"
           className="inline-flex items-center text-gray-400 hover:text-teal-400 mb-6 group transition-colors"
         >
           <FaArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -381,14 +169,14 @@ export default function ProjectDetailsPage() {
               <p className="text-gray-400 mt-2 text-lg">{project.description}</p>
             </div>
             <div className="flex items-center gap-3">
-              <button 
-                onClick={() => setShowAddMember(true)}
+              <button
+                onClick={() => setShowAddNewMember(true)}
                 className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
               >
                 <FaUserPlus className="w-5 h-5 mr-2" />
                 Add Member
               </button>
-              <button 
+              <button
                 onClick={() => setShowAddTask(true)}
                 className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
               >
@@ -442,14 +230,14 @@ export default function ProjectDetailsPage() {
               <FaCalendarAlt className="w-5 h-5 text-teal-400" />
               <div>
                 <p className="text-gray-400">Start Date</p>
-                <p className="font-medium text-white">{project.startDate.toLocaleDateString()}</p>
+                <p className="font-medium text-white">{format(project.startDate, 'MMM d, yyyy')}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 bg-gray-800/80 rounded-lg border border-gray-700/50">
               <FaClock className="w-5 h-5 text-teal-400" />
               <div>
                 <p className="text-gray-400">End Date</p>
-                <p className="font-medium text-white">{project.endDate.toLocaleDateString()}</p>
+                <p className="font-medium text-white">{format(project.endDate, 'MMM d, yyyy')}</p>
               </div>
             </div>
           </div>
@@ -463,13 +251,13 @@ export default function ProjectDetailsPage() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">Team Members</h2>
-                <p className="text-sm text-gray-400">{project.members.length} members in the team</p>
+                <p className="text-sm text-gray-400">{project?.teamMembers?.length} members in the team</p>
               </div>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {project.members.map((member, index) => (
+            {project.teamMembers && project?.teamMembers?.map((member, index) => (
               <motion.div
                 key={member.email}
                 initial={{ opacity: 0, y: 20 }}
@@ -478,12 +266,12 @@ export default function ProjectDetailsPage() {
                 className="flex items-center gap-4 p-4 bg-gray-800/80 rounded-lg border border-gray-700/50 hover:border-gray-600/50 transition-all duration-200"
               >
                 <div className="w-10 h-10 rounded-full bg-teal-600/20 flex items-center justify-center">
-                  <span className="text-teal-400 font-medium">{member.name.charAt(0).toUpperCase()}</span>
+                  <span className="text-teal-400 font-medium">{member?.name?.charAt(0).toUpperCase()}</span>
                 </div>
                 <div>
-                  <h3 className="font-medium text-white">{member.name}</h3>
-                  <p className="text-sm text-gray-400">{member.role}</p>
-                  <p className="text-xs text-gray-500">{member.email}</p>
+                  <h3 className="font-medium text-white">{member?.name}</h3>
+                  <p className="text-sm text-gray-400">{member?.role}</p>
+                  <p className="text-xs text-gray-500">{member?.email}</p>
                 </div>
               </motion.div>
             ))}
@@ -498,9 +286,9 @@ export default function ProjectDetailsPage() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">Tasks</h2>
-                <p className="text-sm text-gray-400">
+                {/* <p className="text-sm text-gray-400">
                   {tasks.filter(t => t.status === 'completed').length} / {tasks.length} completed
-                </p>
+                </p> */}
               </div>
             </div>
           </div>
@@ -530,8 +318,8 @@ export default function ProjectDetailsPage() {
               </select>
             </div>
           </div>
-          
-          <div className="space-y-4">
+
+          {/* <div className="space-y-4">
             {filteredTasks.map((task, index) => (
               <motion.div
                 key={task.id}
@@ -572,9 +360,9 @@ export default function ProjectDetailsPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </div> */}
 
-          {filteredTasks.length === 0 && (
+          {/* {filteredTasks.length === 0 && (
             <div className="text-center py-12">
               <div className="text-gray-400 mb-4">
                 <FaExclamationCircle className="w-12 h-12 mx-auto" />
@@ -582,81 +370,106 @@ export default function ProjectDetailsPage() {
               <h3 className="text-lg font-medium text-white mb-2">No tasks found</h3>
               <p className="text-gray-400">Add a new task to get started</p>
             </div>
-          )}
+          )} */}
         </div>
       </motion.div>
 
+
       <AnimatePresence>
-        {showAddMember && (
+        {showAddNewMember && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm z-50"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50"
+              className="relative bg-gray-800 rounded-xl p-8 w-full max-w-3xl lg:max-w-4xl shadow-2xl border border-gray-700/50"
             >
+              {/* Modal Header */}
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-white">Add Team Member</h2>
-                <button 
-                  onClick={() => setShowAddMember(false)}
+                <button
+                  onClick={() => setShowAddNewMember(false)}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <FaTimes className="w-5 h-5" />
                 </button>
               </div>
-              <form onSubmit={handleAddMember} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter member name"
-                  />
+
+              {/* Modal Content */}
+              {!user?._id || isMembersLoading ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Role</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter member role"
-                  />
+              ) : (
+                <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-white">Team Members</h2>
+                    <div className="flex items-center gap-4">
+                      <select
+                        value={selectedMember}
+                        onChange={(e) => setSelectedMember(e.target.value)}
+                        className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+                      >
+                        <option value="">Select a team member</option>
+                        {filteredMembers?.map((member) => (
+                          <option key={member.email} value={member.name}>
+                            {member.name} - {member.role}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={addTeamMember}
+                        className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                      >
+                        <FaPlus className="w-4 h-4" />
+                        Add Selected Member
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {teamMembers.map((member, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-4 bg-gray-800/80 rounded-lg border border-gray-700/50"
+                      >
+                        <div>
+                          <p className="text-white font-medium">{member.name}</p>
+                          <p className="text-gray-400 text-sm">{member.role}</p>
+                          <p className="text-gray-400 text-sm">{member.email}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeTeamMember(index)}
+                          className="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
-                  <input
-                    type="email"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter member email"
-                  />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-teal-600 text-white py-2.5 px-4 rounded-lg hover:bg-teal-700 transition-colors"
-                  >
-                    Add Member
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddMember(false)}
-                    className="flex-1 bg-gray-700 text-white py-2.5 px-4 rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+              )}
+
+              {/* Save Button */}
+              <div className="absolute bottom-4 right-4">
+                <button
+                  onClick={handleUpdateTeamMembers}
+                  className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                >
+                  Save
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
 
       <AnimatePresence>
         {showAddTask && (
@@ -674,7 +487,7 @@ export default function ProjectDetailsPage() {
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-white">Add New Task</h2>
-                <button 
+                <button
                   onClick={() => setShowAddTask(false)}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
@@ -706,7 +519,7 @@ export default function ProjectDetailsPage() {
                     required
                     className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
                   >
-                    {project.members.map(member => (
+                    {project.teamMembers && project.teamMembers.map(member => (
                       <option key={member.email} value={member.name}>
                         {member.name}
                       </option>

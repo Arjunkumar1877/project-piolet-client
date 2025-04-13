@@ -10,7 +10,7 @@ import { FaArrowLeft, FaPlus } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useGetMembers } from '@/src/api/query';
 import { TeamMember } from '@/src/types/project';
-import { useProject } from '@/src/api/mutations';
+import { useAddProject } from '@/src/api/mutations';
 import { useAuthStore } from '@/src/store/useAuthStore';
 import { format } from 'date-fns';
 
@@ -90,7 +90,7 @@ export default function AddProjectPage() {
     setValue('teamMembers', updatedMembers);
   };
 
-  const Project = useProject();
+  const Project = useAddProject();
 
   const onSubmit = async (data: ProjectFormData) => {
     if (!user?._id) {

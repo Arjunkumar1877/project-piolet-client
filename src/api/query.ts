@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import api from './axios'
-import { Project, TeamMember } from '../types/project';
+import { Project, ProjectDetails, TeamMember } from '../types/project';
 
 
 
@@ -12,7 +12,7 @@ import { Project, TeamMember } from '../types/project';
         if (!userId) {
           throw new Error('User ID is required');
         }
-        const response = await api.get(`/projects/team-members/${userId}`);
+        const response = await api.get(`/team-members/${userId}`);
         return response.data;
       },
       enabled: !!userId,
@@ -32,5 +32,22 @@ import { Project, TeamMember } from '../types/project';
         return response.data;
       },
       enabled: !!userId,
+    });
+  }
+
+
+
+
+  export function useGetProjectsDetails({ projectId }: { projectId: string }) {
+    return useQuery<ProjectDetails>({
+      queryKey: ['team-project', projectId],
+      queryFn: async () => {
+        if (!projectId) {
+          throw new Error('User ID is required');
+        }
+        const response = await api.get(`/projects/details/${projectId}`);
+        return response.data;
+      },
+      enabled: !!projectId,
     });
   }
