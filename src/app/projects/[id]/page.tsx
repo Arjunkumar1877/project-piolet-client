@@ -26,6 +26,7 @@ import {  ProjectDetails, TeamMember } from '@/src/types/project';
 import { format } from 'date-fns';
 import { useAuthStore } from '@/src/store/useAuthStore';
 import {  useAddMembersInProject } from '@/src/api/mutations';
+import AddTaskModal from '@/src/components/tasks/AddTaskModal';
 
 
 
@@ -140,6 +141,8 @@ export default function ProjectDetailsPage() {
   const filteredMembers = availableTeamMembers?.filter((member) => 
     !projectDetails?.teamMembers?.some((item) => item?._id === member._id)
   );
+
+  
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -473,85 +476,7 @@ export default function ProjectDetailsPage() {
 
       <AnimatePresence>
         {showAddTask && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50"
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-white">Add New Task</h2>
-                <button
-                  onClick={() => setShowAddTask(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <FaTimes className="w-5 h-5" />
-                </button>
-              </div>
-              <form onSubmit={handleAddTask} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Title</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter task title"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
-                  <textarea
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter task description"
-                    rows={3}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Assigned To</label>
-                  <select
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
-                  >
-                    {project.teamMembers && project.teamMembers.map(member => (
-                      <option key={member.email} value={member.name}>
-                        {member.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Due Date</label>
-                  <input
-                    type="date"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
-                  />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-teal-600 text-white py-2.5 px-4 rounded-lg hover:bg-teal-700 transition-colors"
-                  >
-                    Add Task
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddTask(false)}
-                    className="flex-1 bg-gray-700 text-white py-2.5 px-4 rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
+        <AddTaskModal setShowAddTask={setShowAddTask} project={project} />
         )}
       </AnimatePresence>
     </div>
