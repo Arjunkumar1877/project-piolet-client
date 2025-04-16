@@ -26,10 +26,10 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<TaskFormInputs>();
 
   const createTask = useCreateTask()
-
   const { id } = useParams();
 
   const onSubmit: SubmitHandler<TaskFormInputs> = (data) => {
@@ -42,7 +42,8 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
       project: id as string,
       ticketNumber,
       startDate: new Date(data.startDate),
-      dueDate: new Date(data.dueDate)
+      dueDate: new Date(data.dueDate),
+      assignedTo: data.assignedTo ? [data.assignedTo] : []
     };
 
     createTask.mutateAsync(taskData);
@@ -85,7 +86,7 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
             <textarea
-              {...register('description', { required: 'Description is required' })}
+              {...register('description')}
               className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
               placeholder="Enter task description"
               rows={3}
@@ -95,13 +96,13 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Assigned To</label>
             <select
-              {...register('assignedTo', { required: 'Please select a team member' })}
+              {...register('assignedTo')}
               className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
             >
               <option value="">Select a team member</option>
               {project.teamMembers &&
                 project.teamMembers.map((member) => (
-                  <option key={member.email} value={member.name}>
+                  <option key={member._id} value={member._id}>
                     {member.name}
                   </option>
                 ))}
