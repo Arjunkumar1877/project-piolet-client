@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import api from './axios'
 import { Project, ProjectDetails, TeamMember } from '../types/project';
+import { Task } from '../types/tasks';
 
 
 
@@ -46,6 +47,23 @@ import { Project, ProjectDetails, TeamMember } from '../types/project';
           throw new Error('User ID is required');
         }
         const response = await api.get(`/projects/details/${projectId}`);
+        return response.data;
+      },
+      enabled: !!projectId,
+    });
+  }
+
+
+
+
+  export function useGetAllTasks({ projectId }: { projectId: string }) {
+    return useQuery<{ tasks: Task[] }>({
+      queryKey: ['tasks', projectId],
+      queryFn: async () => {
+        if (!projectId) {
+          throw new Error('Project ID is required');
+        }
+        const response = await api.get(`/task?projectId=${projectId}`);
         return response.data;
       },
       enabled: !!projectId,

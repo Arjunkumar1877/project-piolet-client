@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from './axios'
 import { Project } from '../types/project'
+import { CreateTaskDto } from '../types/tasks'
 
 export function useSignup() {
   const qc = useQueryClient()
@@ -123,10 +124,33 @@ export function useAddProject() {
   return mutation
 }
 
+
+
 export function useEditProject() {
   const mutation = useMutation({
     mutationFn: async (data: Project) => {
       const response = await api.patch('/projects', data);
+        return response.data
+
+    },
+    onSuccess: (data) => {
+      console.log('saved member successful', data)
+    },
+    onError: (error: Error) => {
+      console.error('saved member failed:', error.message)
+    },
+  })
+
+  return mutation
+}
+
+
+
+
+export function useCreateTask() {
+  const mutation = useMutation({
+    mutationFn: async (data: CreateTaskDto) => {
+      const response = await api.post('/task', data);
         return response.data
 
     },

@@ -17,15 +17,19 @@ import {
   FaTimes,
   FaSearch,
   FaFilter,
+  FaUser,
+  FaFlag,
 } from 'react-icons/fa';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGetMembers, useGetProjectsDetails } from '@/src/api/query';
+import { useGetAllTasks, useGetMembers, useGetProjectsDetails } from '@/src/api/query';
 import {  ProjectDetails, TeamMember } from '@/src/types/project';
 import { format } from 'date-fns';
 import { useAuthStore } from '@/src/store/useAuthStore';
 import {  useAddMembersInProject } from '@/src/api/mutations';
+import AddTaskModal from '@/src/components/tasks/AddTaskModal';
+import { Task } from '@/src/types/tasks';
 
 
 
@@ -46,9 +50,8 @@ export default function ProjectDetailsPage() {
 
   const { data: availableTeamMembers, isLoading: isMembersLoading } = useGetMembers({ userId: user?._id || '' });
   const addMembersToProject = useAddMembersInProject()
-
+  const { data: tasks, isLoading: isTasksLoading } = useGetAllTasks({ projectId: id as string });
   
-
 
 
   const addTeamMember = () => {
@@ -92,18 +95,18 @@ export default function ProjectDetailsPage() {
     }
   };
 
-  // const getPriorityColor = (priority: string) => {
-  //   switch (priority) {
-  //     case 'high':
-  //       return 'text-red-400';
-  //     case 'medium':
-  //       return 'text-amber-400';
-  //     case 'low':
-  //       return 'text-emerald-400';
-  //     default:
-  //       return 'text-gray-400';
-  //   }
-  // };
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'text-red-400';
+      case 'medium':
+        return 'text-amber-400';
+      case 'low':
+        return 'text-emerald-400';
+      default:
+        return 'text-gray-400';
+    }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -132,14 +135,12 @@ export default function ProjectDetailsPage() {
   };
 
 
-  const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setShowAddTask(false);
-  };
 
   const filteredMembers = availableTeamMembers?.filter((member) => 
     !projectDetails?.teamMembers?.some((item) => item?._id === member._id)
   );
+
+  
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -319,48 +320,58 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* <div className="space-y-4">
-            {filteredTasks.map((task, index) => (
-              <motion.div
-                key={task.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="rounded-lg p-6 bg-gray-800/80 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-200"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-medium text-white text-lg">{task.title}</h3>
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${getStatusColor(task.status)} shadow-sm`}>
-                        {getStatusIcon(task.status)}
-                        {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+          <div className="space-y-4">
+            {isTasksLoading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+              </div>
+            ) : (
+              (tasks as unknown as Task[])?.map((task, index) => (
+                <motion.div
+                  key={task._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="rounded-lg p-6 bg-gray-800/80 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-200"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-medium text-white text-lg">{task.title}</h3>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${getStatusColor(task.status)} shadow-sm`}>
+                          {getStatusIcon(task.status)}
+                          {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                        </span>
+                      </div>
+                      <p className="text-gray-400 mt-2">{task.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaFlag className={`w-5 h-5 ${getPriorityColor(task.status)}`} />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <FaUser className="w-4 h-4" />
+                      <span>
+                        {task.assignedTo && task.assignedTo.length > 0 
+                          ? task.assignedTo.map((member: TeamMember) => member.name).join(', ')
+                          : 'Unassigned'}
                       </span>
                     </div>
-                    <p className="text-gray-400 mt-2">{task.description}</p>
+                    <div className="flex items-center gap-2">
+                      <FaCalendarAlt className="w-4 h-4" />
+                      <span>Due: {format(new Date(task.dueDate), 'MMM d, yyyy')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FaClock className="w-4 h-4" />
+                      <span>Updated: {format(new Date(task.updatedAt), 'MMM d, yyyy')}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <FaFlag className={`w-5 h-5 ${getPriorityColor(task.priority)}`} />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
-                  <div className="flex items-center gap-2">
-                    <FaUser className="w-4 h-4" />
-                    <span>{task.assignedTo}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaCalendarAlt className="w-4 h-4" />
-                    <span>Due: {task.dueDate.toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaClock className="w-4 h-4" />
-                    <span>Updated: {task.updatedAt.toLocaleDateString()}</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div> */}
+                </motion.div>
+              ))
+            )}
+          </div>
 
           {/* {filteredTasks.length === 0 && (
             <div className="text-center py-12">
@@ -473,85 +484,7 @@ export default function ProjectDetailsPage() {
 
       <AnimatePresence>
         {showAddTask && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50"
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-white">Add New Task</h2>
-                <button
-                  onClick={() => setShowAddTask(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <FaTimes className="w-5 h-5" />
-                </button>
-              </div>
-              <form onSubmit={handleAddTask} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Title</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter task title"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
-                  <textarea
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
-                    placeholder="Enter task description"
-                    rows={3}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Assigned To</label>
-                  <select
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
-                  >
-                    {project.teamMembers && project.teamMembers.map(member => (
-                      <option key={member.email} value={member.name}>
-                        {member.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Due Date</label>
-                  <input
-                    type="date"
-                    required
-                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
-                  />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="submit"
-                    className="flex-1 bg-teal-600 text-white py-2.5 px-4 rounded-lg hover:bg-teal-700 transition-colors"
-                  >
-                    Add Task
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddTask(false)}
-                    className="flex-1 bg-gray-700 text-white py-2.5 px-4 rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
+        <AddTaskModal setShowAddTask={setShowAddTask} project={project} />
         )}
       </AnimatePresence>
     </div>
