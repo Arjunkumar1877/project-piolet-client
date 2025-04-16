@@ -1,3 +1,5 @@
+import { TeamMember } from "./project";
+
 export interface CreateTaskDto {
     ticketNumber: string;
     title: string;
@@ -30,7 +32,7 @@ export interface CreateTaskDto {
     title: string;
     description?: string;
     project: string;
-    assignedTo?: string[];
+    assignedTo?: TeamMember[];
     status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
     startDate: Date;
     dueDate: Date;

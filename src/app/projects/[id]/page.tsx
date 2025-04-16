@@ -135,10 +135,6 @@ export default function ProjectDetailsPage() {
   };
 
 
-  const handleAddTask = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setShowAddTask(false);
-  };
 
   const filteredMembers = availableTeamMembers?.filter((member) => 
     !projectDetails?.teamMembers?.some((item) => item?._id === member._id)
@@ -359,7 +355,7 @@ export default function ProjectDetailsPage() {
                       <FaUser className="w-4 h-4" />
                       <span>
                         {task.assignedTo && task.assignedTo.length > 0 
-                          ? task.assignedTo.map((member: any) => member.name).join(', ')
+                          ? task.assignedTo.map((member: TeamMember) => member.name).join(', ')
                           : 'Unassigned'}
                       </span>
                     </div>

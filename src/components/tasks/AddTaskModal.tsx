@@ -26,7 +26,6 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm<TaskFormInputs>();
 
   const createTask = useCreateTask()
