@@ -69,3 +69,18 @@ import { Task } from '../types/tasks';
       enabled: !!projectId,
     });
   }
+
+
+  export function  useGetTaskDetails({ taskId }: { taskId: string }) {
+    return useQuery<Task>({
+      queryKey: ['tasks', taskId],
+      queryFn: async () => {
+        if (!taskId) {
+          throw new Error('Project ID is required');
+        }
+        const response = await api.get(`/task/${taskId}`);
+        return response.data;
+      },
+      enabled: !!taskId,
+    });
+  }

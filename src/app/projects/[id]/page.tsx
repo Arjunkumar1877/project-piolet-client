@@ -332,7 +332,8 @@ export default function ProjectDetailsPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="rounded-lg p-6 bg-gray-800/80 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-200"
+                  className="rounded-lg p-6 bg-gray-800/80 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-200 cursor-pointer"
+                  onClick={() => window.location.href = `/projects/${id}/tasks/${task._id}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
