@@ -1,4 +1,4 @@
-
+import { Task } from './tasks';
 
 export interface ProjectMember {
   name: string;
@@ -35,7 +35,11 @@ export type Project = {
   budget: string;
   priority: 'low' | 'medium' | 'high';
   teamMembers?: string[];
+  tasks?: Task[];
   notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 };
 
 

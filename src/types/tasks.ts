@@ -21,7 +21,7 @@ export interface CreateTaskDto {
     description?: string;
     project?: string;
     assignedTo?: string[];
-    status?: 'pending' | 'in-progress' | 'completed' | 'cancelled';
+    status?: 'todo' | 'in-progress' | 'completed' | 'cancelled';
     startDate?: Date;
     dueDate?: Date;
   }
@@ -34,7 +34,7 @@ export interface CreateTaskDto {
     description?: string;
     project: string;
     assignedTo?: TeamMember[];
-    status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
+    status: 'todo' | 'in-progress' | 'completed' | 'cancelled';
     priority: 'low' | 'medium' | 'high';
     startDate: Date;
     dueDate: Date;
