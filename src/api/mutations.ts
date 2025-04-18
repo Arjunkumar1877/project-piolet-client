@@ -155,16 +155,37 @@ export function useCreateTask() {
 
     },
     onSuccess: (data) => {
-      console.log('saved member successful', data)
+      console.log('saved task successful', data)
     },
     onError: (error: Error) => {
-      console.error('saved member failed:', error.message)
+      console.error('saved task failed:', error.message)
     },
   })
 
   return mutation
 }
 
+
+
+
+export function useEditTask() {
+  const mutation = useMutation({
+    mutationFn: async (args: {data: CreateTaskDto, id: string}) => {
+      const { data, id } = args;
+      const response = await api.put(`/task/${id}`, data);
+        return response.data
+    },
+    onSuccess: (data) => {
+      console.log('saved task successful', data)
+    },
+    onError: (error: Error) => {
+      console.error('saved task failed:', error.message)
+    },
+  })
+
+  return mutation
+
+}
 
 
 
