@@ -17,6 +17,8 @@ interface TaskFormInputs {
   title: string;
   description: string;
   assignedTo: string;
+  status:  'todo' | 'in-progress' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high';
   startDate: string;
   dueDate: string;
 }
@@ -37,12 +39,12 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
     
     const taskData: CreateTaskDto = {
       ...data,
-      status: 'pending',
       project: id as string,
       ticketNumber,
       startDate: new Date(data.startDate),
       dueDate: new Date(data.dueDate),
-      assignedTo: data.assignedTo ? [data.assignedTo] : []
+      assignedTo: data.assignedTo ? [data.assignedTo] : [],
+      priority: data.priority
     };
 
     createTask.mutateAsync(taskData);
@@ -107,6 +109,31 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
                 ))}
             </select>
             {errors.assignedTo && <p className="text-red-500 text-sm mt-1">{errors.assignedTo.message}</p>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>
+            <select
+              {...register('status', { required: 'Priority is required' })}
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+            >
+              <option value="todo">Todo</option>
+              <option value="in-progress">In-progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority.message}</p>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>
+            <select
+              {...register('priority', { required: 'Priority is required' })}
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+            {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Start Date</label>
