@@ -52,7 +52,12 @@ export default function ProjectDetailsPage() {
   const addMembersToProject = useAddMembersInProject()
   const { data: tasks, isLoading: isTasksLoading } = useGetAllTasks({ projectId: id as string });
   
-
+  const filteredTasks = (tasks as unknown as Task[])?.filter(task => {
+    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         task.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const addTeamMember = () => {
     if (selectedMember) {
@@ -325,8 +330,16 @@ export default function ProjectDetailsPage() {
               <div className="flex justify-center items-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
               </div>
+            ) : filteredTasks?.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-4">
+                  <FaSearch className="w-12 h-12 mx-auto" />
+                </div>
+                <h3 className="text-lg font-medium text-white mb-2">No tasks found</h3>
+                <p className="text-gray-400">Try adjusting your search or filter criteria</p>
+              </div>
             ) : (
-              (tasks as unknown as Task[])?.map((task, index) => (
+              filteredTasks?.map((task, index) => (
                 <motion.div
                   key={task._id}
                   initial={{ opacity: 0, y: 20 }}

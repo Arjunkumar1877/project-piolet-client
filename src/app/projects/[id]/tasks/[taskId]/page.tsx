@@ -7,7 +7,6 @@ import {
   FaCalendarAlt,
   FaClock,
   FaUser,
-  FaFlag,
   FaCheckCircle,
   FaCircle,
   FaEdit,
@@ -17,7 +16,6 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { useGetTaskDetails } from '@/src/api/query';
 import { TeamMember } from '@/src/types/project';
-import { Task } from '@/src/types/tasks';
 
 export default function TaskDetailsPage() {
   const { id, taskId } = useParams();
