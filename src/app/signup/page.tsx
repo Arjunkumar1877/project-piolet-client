@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { useAuthStore } from '@/src/store/useAuthStore'
 import toast from 'react-hot-toast'
 import { useSignup } from '@/src/api/mutations'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { useRouter } from 'next/navigation'
 import React from 'react'
@@ -31,6 +31,13 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
   const router = useRouter()
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard')
+    }
+  }, [router])
   const {
     register,
     handleSubmit,
@@ -55,8 +62,8 @@ export default function SignupPage() {
       password: data.password,
     });
 
-    if(!res.user){
-        setError('root', { message: res.message })
+    if (!res.user) {
+      setError('root', { message: res.message })
       return toast.error(res.message)
     }
     setUser(res.user)
@@ -77,7 +84,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="max-w-md w-full space-y-8 p-8 bg-[#121212] rounded-lg shadow-lg border border-[#0f717b] shadow-[0_0_15px_rgba(15,113,123,0.3)] relative overflow-hidden">
+      <div className="max-w-md w-full space-y-8 p-8 bg-[#121212] rounded-lg  border border-[#0f717b] shadow-[0_0_15px_rgba(15,113,123,0.3)] relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0f717b] via-[#0f8a96] to-[#0f717b]"></div>
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">

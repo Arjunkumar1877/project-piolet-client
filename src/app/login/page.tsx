@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { useAuthStore } from '@/src/store/useAuthStore'
 import toast from 'react-hot-toast'
 import { useLogin } from '@/src/api/mutations'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { useRouter } from 'next/navigation'
 
@@ -23,6 +23,13 @@ export default function LoginPage() {
   const setAccessToken = useAuthStore((state) => state.setAccessToken)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const router = useRouter()
+  const user = useAuthStore((state)=> state.user);
+
+  useEffect(()=>{
+    if(user){
+      router.push('/dashboard')
+    }
+  },[router])
   const {
     register,
     handleSubmit,
@@ -55,6 +62,7 @@ export default function LoginPage() {
     e.preventDefault()
     setShowPassword(!showPassword)
   }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">

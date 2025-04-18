@@ -24,17 +24,16 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetAllTasks, useGetMembers, useGetProjectsDetails } from '@/src/api/query';
-import {  ProjectDetails, TeamMember } from '@/src/types/project';
+import { ProjectDetails, TeamMember } from '@/src/types/project';
 import { format } from 'date-fns';
 import { useAuthStore } from '@/src/store/useAuthStore';
-import {  useAddMembersInProject } from '@/src/api/mutations';
+import { useAddMembersInProject } from '@/src/api/mutations';
 import AddTaskModal from '@/src/components/tasks/AddTaskModal';
 import { Task } from '@/src/types/tasks';
 
 
 
 export default function ProjectDetailsPage() {
-
   const { id } = useParams();
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddNewMember, setShowAddNewMember] = useState(false);
@@ -47,14 +46,11 @@ export default function ProjectDetailsPage() {
     _id: string; name: string; role: string; email: string
   }>>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
-
   const { data: availableTeamMembers, isLoading: isMembersLoading } = useGetMembers({ userId: user?._id || '' });
-  const addMembersToProject = useAddMembersInProject()
+  const addMembersToProject = useAddMembersInProject();
   const { data: tasks, isLoading: isTasksLoading } = useGetAllTasks({ projectId: id as string });
-  
   const filteredTasks = (tasks as unknown as Task[])?.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         task.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) || task.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -126,6 +122,9 @@ export default function ProjectDetailsPage() {
     }
   };
 
+
+  
+
   const handleUpdateTeamMembers = () => {
     try {
       const response = addMembersToProject.mutateAsync({
@@ -141,11 +140,11 @@ export default function ProjectDetailsPage() {
 
 
 
-  const filteredMembers = availableTeamMembers?.filter((member) => 
+  const filteredMembers = availableTeamMembers?.filter((member) =>
     !projectDetails?.teamMembers?.some((item) => item?._id === member._id)
   );
 
-  
+
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -371,7 +370,7 @@ export default function ProjectDetailsPage() {
                     <div className="flex items-center gap-2">
                       <FaUser className="w-4 h-4 text-teal-400" />
                       <span>
-                        {task.assignedTo && task.assignedTo.length > 0 
+                        {task.assignedTo && task.assignedTo.length > 0
                           ? task.assignedTo.map((member: TeamMember) => member.name).join(', ')
                           : 'Unassigned'}
                       </span>
@@ -501,7 +500,7 @@ export default function ProjectDetailsPage() {
 
       <AnimatePresence>
         {showAddTask && (
-        <AddTaskModal setShowAddTask={setShowAddTask} project={project} />
+          <AddTaskModal setShowAddTask={setShowAddTask} project={project} />
         )}
       </AnimatePresence>
     </div>

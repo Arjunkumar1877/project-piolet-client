@@ -1,51 +1,69 @@
 'use client'
 
+import { useGetProjects } from '@/src/api/query';
+import { useAuthStore } from '@/src/store/useAuthStore';
+import { Project } from '@/src/types/project';
 import { FaProjectDiagram, FaTasks, FaCheckCircle, FaClock, FaSpinner } from 'react-icons/fa'
 
 export default function DashboardPage() {
-  // Static data for now
+  const user = useAuthStore((state) => state.user);
+  const { data: projects, isLoading } = useGetProjects({ userId: user?._id || '' });
+  const allProjects: Project[] = projects || [];
+
+  // Calculate task statistics
+  const totalTasks = allProjects.reduce((acc, project) => acc + (project.tasks?.length || 0), 0);
+  const completedTasks = allProjects.reduce((acc, project) => 
+    acc + (project.tasks?.filter(task => task.status === 'completed').length || 0), 0);
+  const pendingTasks = allProjects.reduce((acc, project) => 
+    acc + (project.tasks?.filter(task => task.status === 'todo').length || 0), 0);
+  const inProgressTasks = allProjects.reduce((acc, project) => 
+    acc + (project.tasks?.filter(task => task.status === 'in-progress').length || 0), 0);
+
   const stats = [
     {
       title: 'Total Projects',
-      value: 12,
+      value: allProjects.length || 0,
       icon: FaProjectDiagram,
       color: 'bg-[#0f717b]',
       textColor: 'text-[#0f717b]',
-      increase: '+2 from last month'
     },
     {
       title: 'Total Tasks',
-      value: 48,
+      value: totalTasks,
       icon: FaTasks,
       color: 'bg-[#2c7a7b]',
       textColor: 'text-[#2c7a7b]',
-      increase: '+5 from last week'
     },
     {
       title: 'Completed Tasks',
-      value: 28,
+      value: completedTasks,
       icon: FaCheckCircle,
       color: 'bg-[#38a169]',
       textColor: 'text-[#38a169]',
-      increase: '+12 this month'
     },
     {
       title: 'Pending Tasks',
-      value: 8,
+      value: pendingTasks,
       icon: FaClock,
       color: 'bg-[#d69e2e]',
       textColor: 'text-[#d69e2e]',
-      increase: '-3 from last week'
     },
     {
       title: 'In Progress',
-      value: 12,
+      value: inProgressTasks,
       icon: FaSpinner,
       color: 'bg-[#3182ce]',
       textColor: 'text-[#3182ce]',
-      increase: '+2 this week'
     }
   ]
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black">
@@ -79,9 +97,7 @@ export default function DashboardPage() {
                     <h3 className="text-3xl font-bold text-white group-hover:text-[#0f717b] transition-colors">
                       {stat.value}
                     </h3>
-                    <p className="text-sm text-gray-400 mt-1">
-                      {stat.increase}
-                    </p>
+             
                   </div>
                 </div>
                 <div className={`${stat.textColor} opacity-20 group-hover:opacity-100 transition-opacity`}>
@@ -106,16 +122,19 @@ export default function DashboardPage() {
         <div className="mt-8 bg-[#121212] rounded-lg p-6 border border-[#1a1a1a]">
           <h2 className="text-xl font-semibold text-white mb-4">Recent Activity</h2>
           <div className="space-y-4">
-            {[1, 2, 3].map((_, index) => (
-              <div key={index} className="flex items-center p-4 bg-[#1a1a1a] rounded-lg">
-                <div className="h-10 w-10 rounded-full bg-[#0f717b] flex items-center justify-center">
-                  <FaTasks className="h-5 w-5 text-white" />
+            {allProjects.map((project) => (
+              project.tasks?.slice(0, 3).map((task, index) => (
+                <div key={index} className="flex items-center p-4 bg-[#1a1a1a] rounded-lg">
+                  <div className="h-10 w-10 rounded-full bg-[#0f717b] flex items-center justify-center">
+                    <FaTasks className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-white font-medium">{task.title}</p>
+                    <p className="text-gray-400 text-sm">Project: {project.projectName}</p>
+                    <p className="text-gray-400 text-sm">Status: {task.status}</p>
+                  </div>
                 </div>
-                <div className="ml-4">
-                  <p className="text-white font-medium">New task added to Project Alpha</p>
-                  <p className="text-gray-400 text-sm">2 hours ago</p>
-                </div>
-              </div>
+              ))
             ))}
           </div>
         </div>

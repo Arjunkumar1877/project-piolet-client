@@ -1,11 +1,10 @@
-
+import { Task } from './tasks';
 
 export interface ProjectMember {
   name: string;
   role: string;
   email: string;
 }
-
 
 export type TeamMember = {
   _id: string
@@ -17,8 +16,6 @@ export type TeamMember = {
   updatedAt: string
   __v: number
 }
-
-
 
 export type Project = {
   _id?: string;
@@ -35,9 +32,12 @@ export type Project = {
   budget: string;
   priority: 'low' | 'medium' | 'high';
   teamMembers?: string[];
+  tasks?: Task[];
   notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 };
-
 
 export type ProjectDetails = {
   _id?: string;

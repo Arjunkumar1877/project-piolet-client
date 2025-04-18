@@ -1,29 +1,30 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaTimes, FaUserMinus, FaChevronDown } from 'react-icons/fa';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { ProjectDetails } from '@/src/types/project';
-import { useCreateTask } from '@/src/api/mutations';
-import { CreateTaskDto } from '@/src/types/tasks';
-import { generateTicketNumber } from '@/src/utils/ticketNumberGenerator';
+import { useEditTask } from '@/src/api/mutations';
+import { CreateTaskDto, Task } from '@/src/types/tasks';
 import { useParams } from 'next/navigation';
+import { format } from 'date-fns';
 
-export interface AddTaskModalProps {
+export interface EditTaskModalProps {
   setShowAddTask: (show: boolean) => void;
   project: ProjectDetails;
+  task?: Task;
 }
 
 export interface TaskFormInputs {
   title: string;
   description: string;
   assignedTo: string[];
-  status:  'todo' | 'in-progress' | 'completed' | 'cancelled';
+  status: 'todo' | 'in-progress' | 'completed' | 'cancelled';
   priority: 'low' | 'medium' | 'high';
   startDate: string;
   dueDate: string;
 }
 
-const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
+const EditTaskModal: FC<EditTaskModalProps> = ({ setShowAddTask, project, task }) => {
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const {
@@ -31,10 +32,25 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm<TaskFormInputs>();
 
-  const createTask = useCreateTask()
-  const { id } = useParams();
+  const editTask = useEditTask();
+  const { id, taskId } = useParams();
+
+  useEffect(() => {
+    if (task) {
+      reset({
+        title: task.title,
+        description: task.description || '',
+        status: task.status,
+        priority: task.priority,
+        startDate: format(new Date(task.startDate), 'yyyy-MM-dd'),
+        dueDate: format(new Date(task.dueDate), 'yyyy-MM-dd'),
+      });
+      setSelectedMembers(task.assignedTo?.map(member => member._id) || []);
+    }
+  }, [task, reset]);
 
   const handleMemberSelect = (memberId: string) => {
     if (!selectedMembers.includes(memberId)) {
@@ -52,19 +68,19 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
   };
 
   const onSubmit: SubmitHandler<TaskFormInputs> = (data) => {
-    const ticketNumber = generateTicketNumber(project, []);
+    if (!task?.ticketNumber) return;
     
     const taskData: CreateTaskDto = {
       ...data,
       project: id as string,
-      ticketNumber,
+      ticketNumber: task.ticketNumber,
       startDate: new Date(data.startDate),
       dueDate: new Date(data.dueDate),
       assignedTo: data.assignedTo || [],
       priority: data.priority
     };
 
-    createTask.mutateAsync(taskData);
+    editTask.mutateAsync({data: taskData, id: taskId as string});
     setShowAddTask(false);
   };
 
@@ -82,7 +98,7 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
         className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50"
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-white">Add New Task</h2>
+          <h2 className="text-2xl font-semibold text-white">Edit Task</h2>
           <button
             onClick={() => setShowAddTask(false)}
             className="text-gray-400 hover:text-white transition-colors"
@@ -169,9 +185,9 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
             <select
-              {...register('status', { required: 'Priority is required' })}
+              {...register('status', { required: 'Status is required' })}
               className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
             >
               <option value="todo">Todo</option>
@@ -179,7 +195,7 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
             </select>
-            {errors.priority && <p className="text-red-500 text-sm mt-1">{errors.priority.message}</p>}
+            {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>
@@ -216,7 +232,7 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
               type="submit"
               className="flex-1 bg-teal-600 text-white py-2.5 px-4 rounded-lg hover:bg-teal-700 transition-colors"
             >
-              Add Task
+              Save Changes
             </button>
             <button
               type="button"
@@ -232,4 +248,4 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
   );
 };
 
-export default AddTaskModal;
+export default EditTaskModal;
