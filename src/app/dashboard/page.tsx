@@ -18,8 +18,6 @@ export default function DashboardPage() {
     acc + (project.tasks?.filter(task => task.status === 'todo').length || 0), 0);
   const inProgressTasks = allProjects.reduce((acc, project) => 
     acc + (project.tasks?.filter(task => task.status === 'in-progress').length || 0), 0);
-  const cancelledTasks = allProjects.reduce((acc, project) => 
-    acc + (project.tasks?.filter(task => task.status === 'cancelled').length || 0), 0);
 
   const stats = [
     {
