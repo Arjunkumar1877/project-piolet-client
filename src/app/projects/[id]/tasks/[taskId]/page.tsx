@@ -11,6 +11,7 @@ import {
   FaCircle,
   FaEdit,
   FaTrash,
+  FaFlag,
 } from 'react-icons/fa';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -42,29 +43,46 @@ export default function TaskDetailsPage() {
     );
   }
 
+
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-blue-900/30 text-blue-400';
+        return 'bg-emerald-900/30 text-emerald-400 border-emerald-500/20';
       case 'in-progress':
-        return 'bg-emerald-900/30 text-emerald-400';
+        return 'bg-blue-900/30 text-blue-400 border-blue-500/20';
       case 'todo':
-        return 'bg-amber-900/30 text-amber-400';
+        return 'bg-amber-900/30 text-amber-400 border-amber-500/20';
       default:
-        return 'bg-gray-800/30 text-gray-400';
+        return 'bg-gray-800/30 text-gray-400 border-gray-500/20';
     }
   };
+
+
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <FaCheckCircle className="w-4 h-4" />;
+        return <FaCheckCircle className="w-4 h-4 text-emerald-400" />;
       case 'in-progress':
-        return <FaCircle className="w-4 h-4" />;
+        return <FaCircle className="w-4 h-4 text-blue-400" />;
       case 'todo':
-        return <FaCircle className="w-4 h-4" />;
+        return <FaCircle className="w-4 h-4 text-amber-400" />;
       default:
-        return <FaCircle className="w-4 h-4" />;
+        return <FaCircle className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'text-red-400 bg-red-900/30 border-red-500/20';
+      case 'medium':
+        return 'text-amber-400 bg-amber-900/30 border-amber-500/20';
+      case 'low':
+        return 'text-emerald-400 bg-emerald-900/30 border-emerald-500/20';
+      default:
+        return 'text-gray-400 bg-gray-800/30 border-gray-500/20';
     }
   };
 
@@ -91,7 +109,12 @@ export default function TaskDetailsPage() {
                   {getStatusIcon(task.status)}
                   {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                 </span>
+
                 <span className="text-gray-400 text-sm">#{task.ticketNumber}</span>
+                <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${getPriorityColor(task.priority)} border`}>
+                  <FaFlag className="w-3 h-3" />
+                  {task.priority}
+                </span>
               </div>
               <h1 className="text-3xl font-bold text-white">{task.title}</h1>
             </div>

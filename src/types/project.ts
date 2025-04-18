@@ -6,7 +6,6 @@ export interface ProjectMember {
   email: string;
 }
 
-
 export type TeamMember = {
   _id: string
   name: string
@@ -17,8 +16,6 @@ export type TeamMember = {
   updatedAt: string
   __v: number
 }
-
-
 
 export type Project = {
   _id?: string;
@@ -41,7 +38,6 @@ export type Project = {
   updatedAt?: string;
   __v?: number;
 };
-
 
 export type ProjectDetails = {
   _id?: string;

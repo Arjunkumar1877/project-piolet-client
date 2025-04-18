@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaUserMinus, FaChevronDown } from 'react-icons/fa';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { ProjectDetails } from '@/src/types/project';
 import { useCreateTask } from '@/src/api/mutations';
@@ -8,15 +8,15 @@ import { CreateTaskDto } from '@/src/types/tasks';
 import { generateTicketNumber } from '@/src/utils/ticketNumberGenerator';
 import { useParams } from 'next/navigation';
 
-interface AddTaskModalProps {
+export interface AddTaskModalProps {
   setShowAddTask: (show: boolean) => void;
   project: ProjectDetails;
 }
 
-interface TaskFormInputs {
+export interface TaskFormInputs {
   title: string;
   description: string;
-  assignedTo: string;
+  assignedTo: string[];
   status:  'todo' | 'in-progress' | 'completed' | 'cancelled';
   priority: 'low' | 'medium' | 'high';
   startDate: string;
@@ -24,18 +24,35 @@ interface TaskFormInputs {
 }
 
 const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<TaskFormInputs>();
 
   const createTask = useCreateTask()
   const { id } = useParams();
 
+  const handleMemberSelect = (memberId: string) => {
+    if (!selectedMembers.includes(memberId)) {
+      const updatedMembers = [...selectedMembers, memberId];
+      setSelectedMembers(updatedMembers);
+      setValue('assignedTo', updatedMembers);
+    }
+    setIsDropdownOpen(false);
+  };
+
+  const removeMember = (memberId: string) => {
+    const updatedMembers = selectedMembers.filter(id => id !== memberId);
+    setSelectedMembers(updatedMembers);
+    setValue('assignedTo', updatedMembers);
+  };
+
   const onSubmit: SubmitHandler<TaskFormInputs> = (data) => {
-    // Generate a unique ticket number
-    const ticketNumber = generateTicketNumber(project, []); // TODO: Pass existing ticket numbers if available
+    const ticketNumber = generateTicketNumber(project, []);
     
     const taskData: CreateTaskDto = {
       ...data,
@@ -43,7 +60,7 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
       ticketNumber,
       startDate: new Date(data.startDate),
       dueDate: new Date(data.dueDate),
-      assignedTo: data.assignedTo ? [data.assignedTo] : [],
+      assignedTo: data.assignedTo || [],
       priority: data.priority
     };
 
@@ -96,19 +113,60 @@ const AddTaskModal: FC<AddTaskModalProps> = ({ setShowAddTask, project }) => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Assigned To</label>
-            <select
-              {...register('assignedTo')}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200"
-            >
-              <option value="">Select a team member</option>
-              {project.teamMembers &&
-                project.teamMembers.map((member) => (
-                  <option key={member._id} value={member._id}>
-                    {member.name}
-                  </option>
-                ))}
-            </select>
-            {errors.assignedTo && <p className="text-red-500 text-sm mt-1">{errors.assignedTo.message}</p>}
+            <div className="space-y-2">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 flex items-center justify-between"
+                >
+                  <span>Select team members</span>
+                  <FaChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'transform rotate-180' : ''}`} />
+                </button>
+                
+                {isDropdownOpen && (
+                  <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {project.teamMembers?.map((member) => (
+                      <button
+                        key={member._id}
+                        type="button"
+                        onClick={() => handleMemberSelect(member._id)}
+                        disabled={selectedMembers.includes(member._id)}
+                        className={`w-full px-4 py-2 text-left text-gray-200 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          selectedMembers.includes(member._id) ? 'bg-gray-700' : ''
+                        }`}
+                      >
+                        {member.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              {/* Selected Members Display */}
+              <div className="flex flex-wrap gap-2 mt-2">
+                {selectedMembers.map((memberId) => {
+                  const member = project.teamMembers?.find(m => m._id === memberId);
+                  if (!member) return null;
+                  
+                  return (
+                    <div
+                      key={memberId}
+                      className="flex items-center gap-1 bg-gray-700 px-3 py-1 rounded-full text-sm"
+                    >
+                      <span className="text-gray-200">{member.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeMember(memberId)}
+                        className="text-gray-400 hover:text-red-400 transition-colors"
+                      >
+                        <FaUserMinus className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Priority</label>

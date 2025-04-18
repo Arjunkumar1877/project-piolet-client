@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -97,6 +97,12 @@ export default function ProjectsPage() {
       toast.error('Failed to add member. Please try again.');
     }
   };
+
+  useEffect(()=>{
+    if(!user){
+      router.push('/login')
+    }
+  },[])
 
   return (
     <div className="container mx-auto px-4 py-8">

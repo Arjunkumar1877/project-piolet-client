@@ -34,7 +34,6 @@ import { Task } from '@/src/types/tasks';
 
 
 export default function ProjectDetailsPage() {
-
   const { id } = useParams();
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddNewMember, setShowAddNewMember] = useState(false);
@@ -47,14 +46,11 @@ export default function ProjectDetailsPage() {
     _id: string; name: string; role: string; email: string
   }>>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
-
   const { data: availableTeamMembers, isLoading: isMembersLoading } = useGetMembers({ userId: user?._id || '' });
-  const addMembersToProject = useAddMembersInProject()
+  const addMembersToProject = useAddMembersInProject();
   const { data: tasks, isLoading: isTasksLoading } = useGetAllTasks({ projectId: id as string });
-  
   const filteredTasks = (tasks as unknown as Task[])?.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         task.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) || task.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
