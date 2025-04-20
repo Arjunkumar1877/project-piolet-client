@@ -108,6 +108,7 @@ export function useAddMembersInProject() {
 
 
 export function useAddProject() {
+  const qc = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (data: Project) => {
       const response = await api.post('/projects', data);
@@ -116,6 +117,7 @@ export function useAddProject() {
     },
     onSuccess: (data) => {
       console.log('saved member successful', data)
+      qc.invalidateQueries({ queryKey: ['team-project'] })
     },
     onError: (error: Error) => {
       console.error('saved member failed:', error.message)
@@ -128,14 +130,17 @@ export function useAddProject() {
 
 
 export function useEditProject() {
+  const qc = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (data: Project) => {
-      const response = await api.patch('/projects', data);
+      const response = await api.patch(`/projects/${data._id}`, data);
         return response.data
 
     },
     onSuccess: (data) => {
       console.log('saved member successful', data)
+      qc.invalidateQueries({ queryKey: ['team-project'] })
+
     },
     onError: (error: Error) => {
       console.error('saved member failed:', error.message)

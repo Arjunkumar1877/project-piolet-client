@@ -21,7 +21,7 @@ import {
   FaFlag,
 } from 'react-icons/fa';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetAllTasks, useGetMembers, useGetProjectsDetails } from '@/src/api/query';
 import { ProjectDetails, TeamMember } from '@/src/types/project';
@@ -40,6 +40,7 @@ export default function ProjectDetailsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { data: projectDetails } = useGetProjectsDetails({ projectId: id as string });
+  const router = useRouter();
   const user = useAuthStore((state) => state.user)
   const project: ProjectDetails = projectDetails as ProjectDetails;
   const [teamMembers, setTeamMembers] = useState<Array<{
@@ -123,7 +124,7 @@ export default function ProjectDetailsPage() {
   };
 
 
-  
+
 
   const handleUpdateTeamMembers = () => {
     try {
@@ -180,6 +181,14 @@ export default function ProjectDetailsPage() {
               >
                 <FaUserPlus className="w-5 h-5 mr-2" />
                 Add Member
+              </button>
+              <button
+                onClick={() => router.push(`/projects/${id}/edit-project`)}
+
+                className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
+              >
+                <FaPlus className="w-5 h-5 mr-2" />
+                Edit Project
               </button>
               <button
                 onClick={() => setShowAddTask(true)}
