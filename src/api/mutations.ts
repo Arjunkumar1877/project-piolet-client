@@ -1,3 +1,4 @@
+'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from './axios'
 import { Project } from '../types/project'
@@ -148,14 +149,15 @@ export function useEditProject() {
 
 
 export function useCreateTask() {
+  const qc = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (data: CreateTaskDto) => {
       const response = await api.post('/task', data);
         return response.data
-
     },
     onSuccess: (data) => {
       console.log('saved task successful', data)
+      qc.invalidateQueries({ queryKey: ['tasks'] })
     },
     onError: (error: Error) => {
       console.error('saved task failed:', error.message)
@@ -169,6 +171,7 @@ export function useCreateTask() {
 
 
 export function useEditTask() {
+  const qc = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (args: {data: CreateTaskDto, id: string}) => {
       const { data, id } = args;
@@ -177,9 +180,33 @@ export function useEditTask() {
     },
     onSuccess: (data) => {
       console.log('saved task successful', data)
+      qc.invalidateQueries({ queryKey: ['tasks'] })
     },
     onError: (error: Error) => {
       console.error('saved task failed:', error.message)
+    },
+  })
+
+  return mutation
+
+}
+
+
+
+export function useDeleteTask() {
+  const qc = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: async (args: {id: string}) => {
+      const { id } = args;
+      const response = await api.delete(`/task/${id}`);
+        return response.data
+    },
+    onSuccess: (data) => {
+      console.log('deleted task successful', data)
+      qc.invalidateQueries({ queryKey: ['tasks'] })
+    },
+    onError: (error: Error) => {
+      console.error('deleted task failed:', error.message)
     },
   })
 
