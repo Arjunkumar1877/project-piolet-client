@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   FaArrowLeft,
@@ -19,12 +19,26 @@ import { useGetTaskDetails, useGetProjectsDetails } from '@/src/api/query';
 import { TeamMember } from '@/src/types/project';
 import { useState } from 'react';
 import EditTaskModal from '@/src/components/tasks/EditTaskModal';
+import { useDeleteTask } from '@/src/api/mutations';
+import toast from 'react-hot-toast';
 
 export default function TaskDetailsPage() {
   const { id, taskId } = useParams();
   const { data: task, isLoading } = useGetTaskDetails({ taskId: taskId as string });
   const { data: project } = useGetProjectsDetails({ projectId: id as string });
   const [showEditModal, setShowEditModal] = useState(false);
+  const router = useRouter();
+  const deleteTask = useDeleteTask();
+
+  const handleDeleteTask = async() => {
+    const res = await deleteTask.mutateAsync({
+      id: taskId as string
+    })
+    if(res){
+      toast.success('Task deleted successfully');
+      router.push(`/projects/${id}`);
+    }
+  }
 
   if (isLoading) {
     return (
@@ -125,7 +139,7 @@ export default function TaskDetailsPage() {
               >
                 <FaEdit className="w-5 h-5" />
               </button>
-              <button className="p-2 text-gray-400 hover:text-red-400 transition-colors">
+              <button onClick={handleDeleteTask} className="p-2 text-gray-400 hover:text-red-400 transition-colors">
                 <FaTrash className="w-5 h-5" />
               </button>
             </div>

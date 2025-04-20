@@ -14,10 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen flex flex-col">
         <QueryClientProvider client={queryClient}>
           <Navbar />
-          <main className="pt-16"> {/* Add padding top to account for fixed navbar */}
+          <main className="flex-1 pt-16 px-4 sm:px-6 lg:px-8 container mx-auto">
             {children}
           </main>
           <Toaster position="top-right" />
