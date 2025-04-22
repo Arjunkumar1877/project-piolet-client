@@ -21,12 +21,14 @@ import { useState } from 'react';
 import EditTaskModal from '@/src/components/tasks/EditTaskModal';
 import { useDeleteTask } from '@/src/api/mutations';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/src/components/common/ConfirmDialog';
 
 export default function TaskDetailsPage() {
   const { id, taskId } = useParams();
   const { data: task, isLoading } = useGetTaskDetails({ taskId: taskId as string });
   const { data: project } = useGetProjectsDetails({ projectId: id as string });
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const router = useRouter();
   const deleteTask = useDeleteTask();
 
@@ -139,7 +141,7 @@ export default function TaskDetailsPage() {
               >
                 <FaEdit className="w-5 h-5" />
               </button>
-              <button onClick={handleDeleteTask} className="p-2 text-gray-400 hover:text-red-400 transition-colors">
+              <button onClick={() => setShowDeleteConfirm(true)} className="p-2 text-gray-400 hover:text-red-400 transition-colors">
                 <FaTrash className="w-5 h-5" />
               </button>
             </div>
@@ -210,6 +212,14 @@ export default function TaskDetailsPage() {
           task={task}
         />
       )}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteTask}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+        confirmText="Delete"
+      />
     </div>
   );
 } 
