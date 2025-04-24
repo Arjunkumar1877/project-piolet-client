@@ -13,6 +13,7 @@ import toast from 'react-hot-toast'
 import { useAddMembers } from '../api/mutations'
 import { MemberFormData, memberSchema } from '../form/form'
 import { AnimatePresence, motion } from 'framer-motion'
+import { PiMicrosoftTeamsLogoBold } from "react-icons/pi";
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -117,6 +118,20 @@ export default function Navbar() {
                 >
                   <FaProjectDiagram className="w-4 h-4" />
                   <span>Projects</span>
+                </Link>
+                <Link
+                  href="/team"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-2 ${
+                    isActive('/team')
+                      ? 'bg-[#0f717b] text-white'
+                      : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  <PiMicrosoftTeamsLogoBold className="w-4 h-4"  />
+
+                
+                  <span>Team</span>
                 </Link>
 
                           <button
