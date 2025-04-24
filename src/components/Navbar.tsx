@@ -3,10 +3,16 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/src/store/useAuthStore'
-import { FaProjectDiagram, FaTasks } from 'react-icons/fa'
+import { FaProjectDiagram, FaTasks, FaTimes, FaUserPlus } from 'react-icons/fa'
 import { RiDashboardLine } from 'react-icons/ri'
 import { BiLogOut, BiMenu } from 'react-icons/bi'
 import { useState, useEffect, useRef } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { useAddMembers } from '../api/mutations'
+import { MemberFormData, memberSchema } from '../form/form'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -15,7 +21,31 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const [showAddMember, setShowAddMember] = useState(false); 
 
+  const addMember = useAddMembers()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<MemberFormData>({
+    resolver: zodResolver(memberSchema),
+  });
+  const handleAddMember = async (data: MemberFormData) => {
+    try {
+      if (!user?._id) {
+        throw new Error('User ID is required');
+      }
+      await addMember.mutateAsync({ ...data, userId: user._id });
+      toast.success('Member added successfully!');
+      setShowAddMember(false);
+      reset();
+    } catch {
+      toast.error('Failed to add member. Please try again.');
+    }
+  };
   const isActive = (path: string) => pathname === path
 
   const handleLogout = () => {
@@ -88,6 +118,14 @@ export default function Navbar() {
                   <FaProjectDiagram className="w-4 h-4" />
                   <span>Projects</span>
                 </Link>
+
+                          <button
+                            onClick={() => setShowAddMember(true)}
+                            className="flex items-center px-3 py-1.5 bg-[#0f717b] cursor-pointer text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
+                          >
+                            <FaUserPlus className="w-5 h-5 mr-2" />
+                            Add a New Member
+                          </button>
               </div>
             )}
           </div>
@@ -230,6 +268,95 @@ export default function Navbar() {
           )}
         </div>
       </div>
+      <AnimatePresence>
+        {showAddMember && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold text-white">Add Team Member</h2>
+                <button
+                  onClick={() => setShowAddMember(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <FaTimes className="w-5 h-5" />
+                </button>
+              </div>
+              <form onSubmit={handleSubmit(handleAddMember)} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                  <input
+                    {...register('name')}
+                    type="text"
+                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                    placeholder="Enter member name"
+                  />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Role</label>
+                  <select
+                    {...register('role')}
+                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                  >
+                    <option value="">Select a role</option>
+                    <option value="UI/UX Designer">UI/UX Designer</option>
+                    <option value="Frontend Developer">Frontend Developer</option>
+                    <option value="Backend Developer">Backend Developer</option>
+                    <option value="Full Stack Developer">Full Stack Developer</option>
+                    <option value="Project Manager">Project Manager</option>
+                    <option value="QA Engineer">QA Engineer</option>
+                    <option value="DevOps Engineer">DevOps Engineer</option>
+                    <option value="Product Manager">Product Manager</option>
+                  </select>
+                  {errors.role && (
+                    <p className="mt-1 text-sm text-red-400">{errors.role.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                  <input
+                    {...register('email')}
+                    type="email"
+                    className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
+                    placeholder="Enter member email"
+                  />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+                  )}
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="submit"
+                    disabled={addMember.isPending}
+                    className="flex-1 bg-teal-600 text-white py-2.5 px-4 rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {addMember.isPending ? 'Adding...' : 'Add Member'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddMember(false)}
+                    className="flex-1 bg-gray-700 text-white py-2.5 px-4 rounded-lg hover:bg-gray-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   )
 } 
