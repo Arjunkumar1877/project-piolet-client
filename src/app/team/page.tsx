@@ -1,43 +1,19 @@
 'use client'
 
+import { useGetMembers } from '@/src/api/query'
+import { useAuthStore } from '@/src/store/useAuthStore'
+import { TeamMember } from '@/src/types/project'
 import { useState } from 'react'
 
-interface TeamMember {
-  id: number
-  name: string
-  role: string
-  bio: string
-}
 
-const teamMembers: TeamMember[] = [
-  {
-    id: 1,
-    name: 'John Doe',
-    role: 'CEO & Founder',
-    bio: 'Visionary leader with 10+ years of experience in software development and team management.'
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    role: 'CTO',
-    bio: 'Technical expert specializing in cloud infrastructure and scalable systems architecture.'
-  },
-  {
-    id: 3,
-    name: 'Mike Johnson',
-    role: 'Lead Developer',
-    bio: 'Full-stack developer with expertise in modern web technologies and agile methodologies.'
-  },
-  {
-    id: 4,
-    name: 'Sarah Williams',
-    role: 'Product Manager',
-    bio: 'Product strategist focused on user experience and market-driven feature development.'
-  }
-]
+
+
+
 
 export default function TeamPage() {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+  const user = useAuthStore((state)=> state.user)
+  const { data: teamMembers , isLoading } = useGetMembers({ userId: user?._id || '' });
 
   return (
     <div className="py-12">
@@ -50,9 +26,16 @@ export default function TeamPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {teamMembers.map((member) => (
+          { isLoading ? (
+                   <div className="flex items-center justify-center min-h-[400px]">
+                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+                 </div>
+          ) : 
+          
+          
+          teamMembers?.map((member) => (
             <div
-              key={member.id}
+              key={member._id}
               className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
               onClick={() => setSelectedMember(member)}
             >
@@ -60,7 +43,7 @@ export default function TeamPage() {
                 {member.name}
               </h3>
               <p className="text-indigo-600 mb-3">{member.role}</p>
-              <p className="text-gray-600 line-clamp-2">{member.bio}</p>
+              <p className="text-gray-600 line-clamp-2">{member.email}</p>
             </div>
           ))}
         </div>
@@ -80,7 +63,7 @@ export default function TeamPage() {
                 </button>
               </div>
               <p className="text-indigo-600 mb-4">{selectedMember.role}</p>
-              <p className="text-gray-600">{selectedMember.bio}</p>
+              <p className="text-gray-600">{selectedMember.email}</p>
             </div>
           </div>
         )}

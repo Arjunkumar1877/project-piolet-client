@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useAuthStore } from '@/src/store/useAuthStore'
-import { FaProjectDiagram, FaTasks, FaTimes, FaUserPlus } from 'react-icons/fa'
-import { RiDashboardLine } from 'react-icons/ri'
-import { BiLogOut, BiMenu } from 'react-icons/bi'
-import { useState, useEffect, useRef } from 'react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import { useAddMembers } from '../api/mutations'
-import { MemberFormData, memberSchema } from '../form/form'
-import { AnimatePresence, motion } from 'framer-motion'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/src/store/useAuthStore";
+import { FaProjectDiagram, FaTasks, FaTimes, FaUserPlus } from "react-icons/fa";
+import { RiDashboardLine } from "react-icons/ri";
+import { BiLogOut, BiMenu } from "react-icons/bi";
+import { useState, useEffect, useRef } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { useAddMembers } from "../api/mutations";
+import { MemberFormData, memberSchema } from "../form/form";
+import { AnimatePresence, motion } from "framer-motion";
 import { PiMicrosoftTeamsLogoBold } from "react-icons/pi";
 
 export default function Navbar() {
-  const pathname = usePathname()
-  const user = useAuthStore((state) => state.user)
-  const clearAuth = useAuthStore((state) => state.logout)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const mobileMenuRef = useRef<HTMLDivElement>(null)
-  const menuButtonRef = useRef<HTMLButtonElement>(null)
-  const [showAddMember, setShowAddMember] = useState(false); 
+  const pathname = usePathname();
+  const user = useAuthStore((state) => state.user);
+  const clearAuth = useAuthStore((state) => state.logout);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const [showAddMember, setShowAddMember] = useState(false);
 
-  const addMember = useAddMembers()
+  const addMember = useAddMembers();
 
   const {
     register,
@@ -37,26 +37,26 @@ export default function Navbar() {
   const handleAddMember = async (data: MemberFormData) => {
     try {
       if (!user?._id) {
-        throw new Error('User ID is required');
+        throw new Error("User ID is required");
       }
       await addMember.mutateAsync({ ...data, userId: user._id });
-      toast.success('Member added successfully!');
+      toast.success("Member added successfully!");
       setShowAddMember(false);
       reset();
     } catch {
-      toast.error('Failed to add member. Please try again.');
+      toast.error("Failed to add member. Please try again.");
     }
   };
-  const isActive = (path: string) => pathname === path
+  const isActive = (path: string) => pathname === path;
 
   const handleLogout = () => {
-    clearAuth()
-    setIsMobileMenuOpen(false)
-  }
+    clearAuth();
+    setIsMobileMenuOpen(false);
+  };
 
   const handleLinkClick = () => {
-    setIsMobileMenuOpen(false)
-  }
+    setIsMobileMenuOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -66,15 +66,15 @@ export default function Navbar() {
         menuButtonRef.current &&
         !menuButtonRef.current.contains(event.target as Node)
       ) {
-        setIsMobileMenuOpen(false)
+        setIsMobileMenuOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="bg-[#121212] border-b border-[#1a1a1a] fixed w-full top-0 z-50">
@@ -84,7 +84,11 @@ export default function Navbar() {
           <div className="flex">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="flex items-center space-x-2" onClick={handleLinkClick}>
+              <Link
+                href="/"
+                className="flex items-center space-x-2"
+                onClick={handleLinkClick}
+              >
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[#0f717b] to-[#0f8a96] flex items-center justify-center">
                   <FaTasks className="w-5 h-5 text-white" />
                 </div>
@@ -98,9 +102,9 @@ export default function Navbar() {
                 <Link
                   href="/dashboard"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-2 ${
-                    isActive('/dashboard')
-                      ? 'bg-[#0f717b] text-white'
-                      : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                    isActive("/dashboard")
+                      ? "bg-[#0f717b] text-white"
+                      : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -110,9 +114,9 @@ export default function Navbar() {
                 <Link
                   href="/projects"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-2 ${
-                    isActive('/projects')
-                      ? 'bg-[#0f717b] text-white'
-                      : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                    isActive("/projects")
+                      ? "bg-[#0f717b] text-white"
+                      : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -122,25 +126,24 @@ export default function Navbar() {
                 <Link
                   href="/team"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center space-x-2 ${
-                    isActive('/team')
-                      ? 'bg-[#0f717b] text-white'
-                      : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                    isActive("/team")
+                      ? "bg-[#0f717b] text-white"
+                      : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                   }`}
                   onClick={handleLinkClick}
                 >
-                  <PiMicrosoftTeamsLogoBold className="w-4 h-4"  />
+                  <PiMicrosoftTeamsLogoBold className="w-4 h-4" />
 
-                
                   <span>Team</span>
                 </Link>
 
-                          <button
-                            onClick={() => setShowAddMember(true)}
-                            className="flex items-center px-3 py-1.5 bg-[#0f717b] cursor-pointer text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
-                          >
-                            <FaUserPlus className="w-5 h-5 mr-2" />
-                            Add a New Member
-                          </button>
+                <button
+                  onClick={() => setShowAddMember(true)}
+                  className="flex items-center px-3 py-1.5 bg-[#0f717b] cursor-pointer text-white rounded-lg hover:bg-teal-700 transition-all duration-200"
+                >
+                  <FaUserPlus className="w-5 h-5 mr-2" />
+                  Add a New Member
+                </button>
               </div>
             )}
           </div>
@@ -168,9 +171,9 @@ export default function Navbar() {
                 <Link
                   href="/login"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    isActive('/login')
-                      ? 'bg-[#0f717b] text-white'
-                      : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                    isActive("/login")
+                      ? "bg-[#0f717b] text-white"
+                      : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -179,9 +182,9 @@ export default function Navbar() {
                 <Link
                   href="/signup"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    isActive('/signup')
-                      ? 'bg-[#0f717b] text-white'
-                      : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                    isActive("/signup")
+                      ? "bg-[#0f717b] text-white"
+                      : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -205,9 +208,9 @@ export default function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      <div 
+      <div
         ref={mobileMenuRef}
-        className={`sm:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}
+        className={`sm:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}
       >
         <div className="px-2 pt-2 pb-3 space-y-1">
           {user ? (
@@ -215,9 +218,9 @@ export default function Navbar() {
               <Link
                 href="/dashboard"
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive('/dashboard')
-                    ? 'bg-[#0f717b] text-white'
-                    : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                  isActive("/dashboard")
+                    ? "bg-[#0f717b] text-white"
+                    : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                 }`}
                 onClick={handleLinkClick}
               >
@@ -226,9 +229,9 @@ export default function Navbar() {
               <Link
                 href="/projects"
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive('/projects')
-                    ? 'bg-[#0f717b] text-white'
-                    : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                  isActive("/projects")
+                    ? "bg-[#0f717b] text-white"
+                    : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                 }`}
                 onClick={handleLinkClick}
               >
@@ -242,7 +245,9 @@ export default function Navbar() {
                     </span>
                   </div>
                   <div className="ml-3">
-                    <div className="text-base font-medium text-white">{user.name}</div>
+                    <div className="text-base font-medium text-white">
+                      {user.name}
+                    </div>
                   </div>
                 </div>
                 <div className="mt-3 px-2">
@@ -260,9 +265,9 @@ export default function Navbar() {
               <Link
                 href="/login"
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive('/login')
-                    ? 'bg-[#0f717b] text-white'
-                    : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                  isActive("/login")
+                    ? "bg-[#0f717b] text-white"
+                    : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                 }`}
                 onClick={handleLinkClick}
               >
@@ -271,9 +276,9 @@ export default function Navbar() {
               <Link
                 href="/signup"
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive('/signup')
-                    ? 'bg-[#0f717b] text-white'
-                    : 'text-gray-300 hover:bg-[#1a1a1a] hover:text-white'
+                  isActive("/signup")
+                    ? "bg-[#0f717b] text-white"
+                    : "text-gray-300 hover:bg-[#1a1a1a] hover:text-white"
                 }`}
                 onClick={handleLinkClick}
               >
@@ -298,7 +303,9 @@ export default function Navbar() {
               className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700/50"
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold text-white">Add Team Member</h2>
+                <h2 className="text-2xl font-semibold text-white">
+                  Add Team Member
+                </h2>
                 <button
                   onClick={() => setShowAddMember(false)}
                   className="text-gray-400 hover:text-white transition-colors"
@@ -306,49 +313,68 @@ export default function Navbar() {
                   <FaTimes className="w-5 h-5" />
                 </button>
               </div>
-              <form onSubmit={handleSubmit(handleAddMember)} className="space-y-4">
+              <form
+                onSubmit={handleSubmit(handleAddMember)}
+                className="space-y-4"
+              >
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Name
+                  </label>
                   <input
-                    {...register('name')}
+                    {...register("name")}
                     type="text"
                     className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
                     placeholder="Enter member name"
                   />
                   {errors.name && (
-                    <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
+                    <p className="mt-1 text-sm text-red-400">
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Role</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Role
+                  </label>
                   <select
-                    {...register('role')}
+                    {...register("role")}
                     className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
                   >
                     <option value="">Select a role</option>
                     <option value="UI/UX Designer">UI/UX Designer</option>
-                    <option value="Frontend Developer">Frontend Developer</option>
+                    <option value="Frontend Developer">
+                      Frontend Developer
+                    </option>
                     <option value="Backend Developer">Backend Developer</option>
-                    <option value="Full Stack Developer">Full Stack Developer</option>
+                    <option value="Full Stack Developer">
+                      Full Stack Developer
+                    </option>
                     <option value="Project Manager">Project Manager</option>
                     <option value="QA Engineer">QA Engineer</option>
                     <option value="DevOps Engineer">DevOps Engineer</option>
                     <option value="Product Manager">Product Manager</option>
                   </select>
                   {errors.role && (
-                    <p className="mt-1 text-sm text-red-400">{errors.role.message}</p>
+                    <p className="mt-1 text-sm text-red-400">
+                      {errors.role.message}
+                    </p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Email
+                  </label>
                   <input
-                    {...register('email')}
+                    {...register("email")}
                     type="email"
                     className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-200 placeholder-gray-500"
                     placeholder="Enter member email"
                   />
                   {errors.email && (
-                    <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+                    <p className="mt-1 text-sm text-red-400">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
                 <div className="flex gap-3 pt-2">
@@ -357,7 +383,7 @@ export default function Navbar() {
                     disabled={addMember.isPending}
                     className="flex-1 bg-teal-600 text-white py-2.5 px-4 rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {addMember.isPending ? 'Adding...' : 'Add Member'}
+                    {addMember.isPending ? "Adding..." : "Add Member"}
                   </button>
                   <button
                     type="button"
@@ -373,5 +399,5 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </nav>
-  )
-} 
+  );
+}

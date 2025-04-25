@@ -1,8 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from "react";
 import {
   FaPlus,
   FaCalendarAlt,
@@ -17,55 +15,52 @@ import {
   FaArrowRight,
   FaCheckCircle,
   FaCircle,
-  FaUserPlus,
-  FaTimes,
-} from 'react-icons/fa';
-import Link from 'next/link';
-import { Project } from '@/src/types/project';
-import { useRouter } from 'next/navigation';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useAddMembers } from '@/src/api/mutations';
-import toast from 'react-hot-toast';
-import { useAuthStore } from '@/src/store/useAuthStore';
-import { useGetProjects } from '@/src/api/query';
-import { format } from 'date-fns';
-import { MemberFormData, memberSchema } from '@/src/form/form';
-
+} from "react-icons/fa";
+import Link from "next/link";
+import { Project } from "@/src/types/project";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/src/store/useAuthStore";
+import { useGetProjects } from "@/src/api/query";
+import { format } from "date-fns";
 
 export default function ProjectsPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const user = useAuthStore((state) => state.user);
-  const { data: projects, isLoading } = useGetProjects({ userId: user?._id || '' });
-  const allProjects: Project[] = projects || []
+  const { data: projects, isLoading } = useGetProjects({
+    userId: user?._id || "",
+  });
+  const allProjects: Project[] = projects || [];
 
-  const filteredProjects = allProjects.filter(project => {
-    const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+  const filteredProjects = allProjects.filter((project) => {
+    const matchesSearch = project.projectName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'bg-emerald-900/30 text-emerald-400';
-      case 'completed':
-        return 'bg-blue-900/30 text-blue-400';
-      case 'on-hold':
-        return 'bg-amber-900/30 text-amber-400';
+      case "active":
+        return "bg-emerald-900/30 text-emerald-400";
+      case "completed":
+        return "bg-blue-900/30 text-blue-400";
+      case "on-hold":
+        return "bg-amber-900/30 text-amber-400";
       default:
-        return 'bg-gray-800/30 text-gray-400';
+        return "bg-gray-800/30 text-gray-400";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active':
+      case "active":
         return <FaCircle className="w-4 h-4" />;
-      case 'completed':
+      case "completed":
         return <FaCheckCircle className="w-4 h-4" />;
-      case 'on-hold':
+      case "on-hold":
         return <FaClock className="w-4 h-4" />;
       default:
         return <FaCircle className="w-4 h-4" />;
@@ -73,14 +68,11 @@ export default function ProjectsPage() {
   };
   const router = useRouter();
 
-
-
-
-  useEffect(()=>{
-    if(!user){
-      router.push('/login')
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
     }
-  },[])
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -91,8 +83,10 @@ export default function ProjectsPage() {
           <p className="text-gray-400 mt-1">Manage and track your projects</p>
         </div>
         <div className="flex items-center gap-2">
-
-          <button onClick={() => router.push('/projects/add-projects')} className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+          <button
+            onClick={() => router.push("/projects/add-projects")}
+            className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+          >
             <FaPlus className="w-5 h-5 mr-2" />
             New Project
           </button>
@@ -145,15 +139,22 @@ export default function ProjectsPage() {
                   <div className="flex items-start justify-between mb-4 p-6">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(project.status)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(
+                            project.status
+                          )}`}
+                        >
                           {getStatusIcon(project.status)}
-                          {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                          {project.status.charAt(0).toUpperCase() +
+                            project.status.slice(1)}
                         </span>
                       </div>
                       <h3 className="text-xl font-semibold text-white group-hover:text-teal-400 transition-colors line-clamp-1">
                         {project.projectName}
                       </h3>
-                      <p className="text-gray-400 mt-2 line-clamp-2 text-sm">{project.description}</p>
+                      <p className="text-gray-400 mt-2 line-clamp-2 text-sm">
+                        {project.description}
+                      </p>
                     </div>
                   </div>
 
@@ -162,15 +163,21 @@ export default function ProjectsPage() {
                     <div className="space-y-2.5 bg-gray-800/80 rounded-lg p-6 border border-gray-700/50">
                       <div className="flex items-center gap-2">
                         <FaBuilding className="w-5 h-5 text-teal-400" />
-                        <span className="text-sm text-gray-300">{project.clientName}</span>
+                        <span className="text-sm text-gray-300">
+                          {project.clientName}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <FaEnvelope className="w-5 h-5 text-teal-400" />
-                        <span className="text-sm text-gray-300">{project.clientEmail}</span>
+                        <span className="text-sm text-gray-300">
+                          {project.clientEmail}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <FaPhone className="w-5 h-5 text-teal-400" />
-                        <span className="text-sm text-gray-300">{project.clientPhone}</span>
+                        <span className="text-sm text-gray-300">
+                          {project.clientPhone}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -183,7 +190,9 @@ export default function ProjectsPage() {
                           <div className="p-1.5 bg-blue-900/30 rounded-lg">
                             <FaUsers className="w-5 h-5 text-blue-400" />
                           </div>
-                          <span className="text-sm font-medium text-gray-300">{project?.teamMembers?.length} members</span>
+                          <span className="text-sm font-medium text-gray-300">
+                            {project?.teamMembers?.length} members
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="p-1.5 bg-emerald-900/30 rounded-lg">
@@ -195,7 +204,9 @@ export default function ProjectsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 text-teal-400 group-hover:gap-3 transition-all">
-                        <span className="text-sm font-medium">View Details</span>
+                        <span className="text-sm font-medium">
+                          View Details
+                        </span>
                         <FaArrowRight className="w-5 h-5 text-teal-400/70 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
@@ -207,11 +218,15 @@ export default function ProjectsPage() {
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <FaCalendarAlt className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm text-gray-400">Start: {format(project.startDate, 'MMM d, yyyy')}</span>
+                      <span className="text-sm text-gray-400">
+                        Start: {format(project.startDate, "MMM d, yyyy")}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaClock className="w-5 h-5 text-gray-400" />
-                      <span className="text-sm text-gray-400">End: {format(project.endDate, 'MMM d, yyyy')}</span>
+                      <span className="text-sm text-gray-400">
+                        End: {format(project.endDate, "MMM d, yyyy")}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -227,13 +242,14 @@ export default function ProjectsPage() {
           <div className="text-gray-500 mb-4">
             <FaExclamationCircle className="w-12 h-12 mx-auto" />
           </div>
-          <h3 className="text-lg font-medium text-white mb-2">No projects found</h3>
-          <p className="text-gray-400">Try adjusting your search or filter criteria</p>
+          <h3 className="text-lg font-medium text-white mb-2">
+            No projects found
+          </h3>
+          <p className="text-gray-400">
+            Try adjusting your search or filter criteria
+          </p>
         </div>
       )}
-
-
-
     </div>
   );
 }
