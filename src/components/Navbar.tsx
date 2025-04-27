@@ -39,8 +39,14 @@ export default function Navbar() {
       if (!user?._id) {
         throw new Error("User ID is required");
       }
-      await addMember.mutateAsync({ ...data, userId: user._id });
-      toast.success("Member added successfully!");
+      const res = await addMember.mutateAsync({ ...data, userId: user._id });
+
+      if(res.saved){
+        toast.success(res.message)
+      }else{
+        toast.error(res.message)
+      }
+       
       setShowAddMember(false);
       reset();
     } catch {
