@@ -58,6 +58,7 @@ export function useLogin() {
 
 
 export function useAddMembers() {
+  const qc = useQueryClient()
   const mutation = useMutation({
     mutationFn: async ({ name, role, email , userId}: { name: string; role: string; email: string , userId: string }) => {
         const response = await api.post('/team-members', {
@@ -68,6 +69,8 @@ export function useAddMembers() {
     },
     onSuccess: (data) => {
       console.log('saved member successful', data)
+      qc.invalidateQueries({ queryKey: ['team-members'] })
+
     },
     onError: (error: Error) => {
       console.error('saved member failed:', error.message)
@@ -80,6 +83,7 @@ export function useAddMembers() {
 
 
 export function useAddMembersInProject() {
+  const qc = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (args: { memberId: string[], projectId: string }) => {
       const { memberId, projectId } = args;
@@ -92,6 +96,7 @@ export function useAddMembersInProject() {
     },
     onSuccess: (data) => {
       console.log('saved member to the project successful', data)
+      qc.invalidateQueries({ queryKey: ['team-project'] })
     },
     onError: (error: Error) => {
       console.error('saving member to the project failed:', error.message)
@@ -118,6 +123,7 @@ export function useAddProject() {
     onSuccess: (data) => {
       console.log('saved member successful', data)
       qc.invalidateQueries({ queryKey: ['team-project'] })
+      
     },
     onError: (error: Error) => {
       console.error('saved member failed:', error.message)
