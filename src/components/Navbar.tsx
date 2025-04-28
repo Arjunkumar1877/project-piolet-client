@@ -157,6 +157,7 @@ export default function Navbar() {
           {/* Right side - Auth navigation */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             {user ? (
+         <Link href='/profile'>
               <div className="flex items-center space-x-4">
                 <div className="text-gray-300 flex items-center">
                   <span className="h-8 w-8 rounded-full bg-[#0f717b] flex items-center justify-center text-white font-medium">
@@ -172,6 +173,7 @@ export default function Navbar() {
                   <span>Logout</span>
                 </button>
               </div>
+         </Link>
             ) : (
               <div className="flex items-center space-x-4">
                 <Link

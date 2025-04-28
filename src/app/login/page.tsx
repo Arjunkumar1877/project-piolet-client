@@ -29,7 +29,7 @@ export default function LoginPage() {
     if(user){
       router.push('/dashboard')
     }
-  },[router])
+  },[router, user])
   const {
     register,
     handleSubmit,
