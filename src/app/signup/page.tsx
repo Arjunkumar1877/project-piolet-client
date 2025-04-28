@@ -37,7 +37,7 @@ export default function SignupPage() {
     if (user) {
       router.push('/dashboard')
     }
-  }, [router])
+  }, [router, user])
   const {
     register,
     handleSubmit,

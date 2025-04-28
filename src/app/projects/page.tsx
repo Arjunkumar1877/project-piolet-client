@@ -70,9 +70,9 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     if (!user) {
-      router.push("/login");
+      router.push('/login')
     }
-  }, []);
+  }, [router, user])
 
   return (
     <div className="container mx-auto px-4 py-8">
