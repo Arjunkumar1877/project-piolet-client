@@ -17,8 +17,8 @@ import { PiMicrosoftTeamsLogoBold } from "react-icons/pi";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const user = useAuthStore((state) => state.user);
-  const clearAuth = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.currentUser);
+  const clearAuth = useAuthStore().actions.userLoggedOut;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);

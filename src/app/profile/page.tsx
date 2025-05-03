@@ -17,7 +17,7 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>
 
 export default function ProfilePage() {
-  const user = useAuthStore((state) => state.user)
+  const user = useAuthStore((state) => state.currentUser)
   const router = useRouter()
   const updateProfile = useUpdateProfile()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -108,6 +108,7 @@ export default function ProfilePage() {
                   type="email"
                   id="email"
                   {...register('email')}
+                  disabled
                   className="mt-1 block w-full rounded-md bg-[#2a2a2a] border border-[#3a3a3a] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0f717b] focus:border-transparent"
                 />
                 {errors.email && (

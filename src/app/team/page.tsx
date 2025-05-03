@@ -12,7 +12,7 @@ import { useState } from 'react'
 
 export default function TeamPage() {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
-  const user = useAuthStore((state)=> state.user)
+  const user = useAuthStore((state)=> state.currentUser)
   const { data: teamMembers , isLoading } = useGetMembers({ userId: user?._id || '' });
 
   return (

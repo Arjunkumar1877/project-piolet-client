@@ -26,12 +26,11 @@ type SignupFormData = z.infer<typeof signupSchema>
 
 
 export default function SignupPage() {
-  const setUser = useAuthStore((state) => state.setUser)
-  const setAccessToken = useAuthStore((state) => state.setAccessToken)
+  const setUser = useAuthStore().actions.loggedInUserReceived
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
   const router = useRouter()
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state) => state.currentUser);
 
   useEffect(() => {
     if (user) {
@@ -66,10 +65,8 @@ export default function SignupPage() {
       setError('root', { message: res.message })
       return toast.error(res.message)
     }
-    setUser(res.user)
-    setAccessToken(res.accessToken)
     toast.success(res.message)
-    router.push('/dashboard')
+    router.push('/login')
   }
 
   const handleShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {

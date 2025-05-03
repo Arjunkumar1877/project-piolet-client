@@ -26,7 +26,7 @@ import { format } from "date-fns";
 export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state) => state.currentUser);
   const { data: projects, isLoading } = useGetProjects({
     userId: user?._id || "",
   });

@@ -6,7 +6,7 @@ import { Project } from '@/src/types/project';
 import { FaProjectDiagram, FaTasks, FaCheckCircle, FaClock, FaSpinner } from 'react-icons/fa'
 
 export default function DashboardPage() {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state) => state.currentUser);
   const { data: projects, isLoading } = useGetProjects({ userId: user?._id || '' });
   const allProjects: Project[] = projects || [];
 
