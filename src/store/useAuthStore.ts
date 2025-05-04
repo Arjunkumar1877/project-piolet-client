@@ -3,12 +3,15 @@ import { persist } from 'zustand/middleware'
 import { User } from '@firebase/auth'
 
 
-interface UserType {
-  _id: string
-  email: string
-  name: string
-  // Add other user properties as needed
+interface UserType  {
+  _id: string; // MongoDB ObjectId represented as a string
+  name: string;
+  email: string;
+  firebaseId: string;
+  createdAt: string; // ISO 8601 date string
+  __v: number; // Mongoose version key
 }
+
 
 export type AuthState = {
   status: 'loading' | 'logged_in' | 'logout_triggered' | 'logged_out'

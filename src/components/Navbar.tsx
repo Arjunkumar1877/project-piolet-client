@@ -14,11 +14,12 @@ import { useAddMembers } from "../api/mutations";
 import { MemberFormData, memberSchema } from "../form/form";
 import { AnimatePresence, motion } from "framer-motion";
 import { PiMicrosoftTeamsLogoBold } from "react-icons/pi";
+import { logout } from '../lib/firebase';
 
 export default function Navbar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.currentUser);
-  const clearAuth = useAuthStore().actions.userLoggedOut;
+  const authStore = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -55,9 +56,15 @@ export default function Navbar() {
   };
   const isActive = (path: string) => pathname === path;
 
-  const handleLogout = () => {
-    clearAuth();
-    setIsMobileMenuOpen(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      authStore.actions.userLoggedOut();
+      setIsMobileMenuOpen(false);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      toast.error('Failed to logout. Please try again.');
+    }
   };
 
   const handleLinkClick = () => {

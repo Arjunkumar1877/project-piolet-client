@@ -52,6 +52,7 @@ export function useLogin() {
     },
     onSuccess: (data) => {
       console.log("Login successful", data);
+
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -220,16 +221,22 @@ export function useUpdateProfile() {
   const setUser = useAuthStore().actions.loggedInUserReceived;
 
   return useMutation({
-    mutationFn: async (data: {
-      name: string;
-      email: string;
+    mutationFn: async (args: {
+   user: {
+    name: string;
+    email: string;
+   },
+   firebaseId: string
     }) => {
-      const res = await api.put("/users/profile", data);
+      const { user, firebaseId } = args;
+
+      const res = await api.put(`/users/${firebaseId}`, user);
       return res.data;
     },
     onSuccess: (data) => {
-      setUser(data.user);
-      qc.invalidateQueries({ queryKey: ["user"] });
+      setUser(data);
+      console.log(data)
+      qc.invalidateQueries({ queryKey: ["user-details"] });
       toast.success("Profile updated successfully!");
     },
     onError: (error) => {

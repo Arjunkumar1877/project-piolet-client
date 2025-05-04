@@ -10,7 +10,6 @@ export default function DashboardPage() {
   const { data: projects, isLoading } = useGetProjects({ userId: user?._id || '' });
   const allProjects: Project[] = projects || [];
 
-  // Calculate task statistics
   const totalTasks = allProjects.reduce((acc, project) => acc + (project.tasks?.length || 0), 0);
   const completedTasks = allProjects.reduce((acc, project) => 
     acc + (project.tasks?.filter(task => task.status === 'completed').length || 0), 0);
@@ -66,6 +65,7 @@ export default function DashboardPage() {
   }
 
   return (
+
     <div className="min-h-screen bg-black">
       {/* Header */}
       <div className="bg-[#121212] border-b border-[#1a1a1a]">
@@ -140,5 +140,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+
   )
 } 

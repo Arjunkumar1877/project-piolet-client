@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getIdToken } from '../lib/firebase'
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -8,13 +9,14 @@ const api = axios.create({
 })
 
 // Add a request interceptor to add the auth token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth-storage')
-    ? JSON.parse(localStorage.getItem('auth-storage') || '{}').state?.accessToken
-    : null
-    
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+api.interceptors.request.use(async (config) => {
+  try {
+    const token = await getIdToken()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+  } catch (error) {
+    console.error('Error getting auth token:', error)
   }
   
   return config

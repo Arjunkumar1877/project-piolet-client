@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from './axios'
 import { Project, ProjectDetails, TeamMember } from '../types/project';
 import { Task } from '../types/tasks';
+import { auth, getIdToken } from '../lib/firebase';
 
 
 
@@ -87,5 +88,24 @@ import { Task } from '../types/tasks';
 
 
 
+  export function useGetUser() {
+    return useQuery({
+      queryKey: ['user-details'],
+      queryFn: async () => {
+        const token = await getIdToken();
+        if (!token) {
+          throw new Error('No token available');
+        }
+        
+        // Send the token to your backend for verification
+        const response = await api.post("/auth/verify-token", {
+          token
+        });
+        return response.data;
+      },
+    });
+  }
 
-  
+
+
+

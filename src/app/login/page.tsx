@@ -46,6 +46,7 @@ export default function LoginPage() {
       return toast.error(res.message)
      }
     toast.success(res.message)
+    setUser(res.user)
         router.push('/dashboard')
   }
 

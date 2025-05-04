@@ -18,7 +18,7 @@ type ProfileFormData = z.infer<typeof profileSchema>
 
 export default function ProfilePage() {
   const user = useAuthStore((state) => state.currentUser)
-  const router = useRouter()
+  const setUser = useAuthStore((state) => state.actions.loggedInUserReceived)
   const updateProfile = useUpdateProfile()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
@@ -29,25 +29,20 @@ export default function ProfilePage() {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
+      name: user?.name,
+      email: user?.email,
     },
   })
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-    }
-  }, [user, router])
-
   const onSubmit = async (data: ProfileFormData) => {
-    await updateProfile.mutateAsync(data)
+   const res = await updateProfile.mutateAsync({
+      user: data,
+      firebaseId: user?.firebaseId || ''
+    })
+    console.log(res)
     setIsEditModalOpen(false)
   }
 
-  if (!user) {
-    return null
-  }
 
   return (
     <div className="min-h-screen bg-[#121212] py-12">
@@ -67,12 +62,12 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-sm font-medium text-gray-400">Name</h2>
-              <p className="mt-1 text-lg text-white">{user.name}</p>
+              <p className="mt-1 text-lg text-white">{user?.name}</p>
             </div>
 
             <div>
               <h2 className="text-sm font-medium text-gray-400">Email</h2>
-              <p className="mt-1 text-lg text-white">{user.email}</p>
+              <p className="mt-1 text-lg text-white">{user?.email}</p>
             </div>
           </div>
         </div>
