@@ -4,8 +4,7 @@ import { useAuthStore } from '@/src/store/useAuthStore'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import {  useState } from 'react'
 import { useUpdateProfile } from '@/src/api/mutations'
 import { FaEdit } from 'react-icons/fa'
 
@@ -18,7 +17,6 @@ type ProfileFormData = z.infer<typeof profileSchema>
 
 export default function ProfilePage() {
   const user = useAuthStore((state) => state.currentUser)
-  const setUser = useAuthStore((state) => state.actions.loggedInUserReceived)
   const updateProfile = useUpdateProfile()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 

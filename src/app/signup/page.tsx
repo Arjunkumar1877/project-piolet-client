@@ -26,7 +26,6 @@ type SignupFormData = z.infer<typeof signupSchema>
 
 
 export default function SignupPage() {
-  const setUser = useAuthStore().actions.loggedInUserReceived
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
   const router = useRouter()

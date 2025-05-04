@@ -5,7 +5,7 @@ import { Project } from "../types/project";
 import { CreateTaskDto } from "../types/tasks";
 import { useAuthStore } from "@/src/store/useAuthStore";
 import { toast } from "react-hot-toast";
-import { loginWithEmailAndPassword, getIdToken } from '../lib/firebase';
+import { loginWithEmailAndPassword } from '../lib/firebase';
 
 export function useSignup() {
   const qc = useQueryClient();

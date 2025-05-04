@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from './axios'
 import { Project, ProjectDetails, TeamMember } from '../types/project';
 import { Task } from '../types/tasks';
-import { auth, getIdToken } from '../lib/firebase';
+import {  getIdToken } from '../lib/firebase';
 
 
 
