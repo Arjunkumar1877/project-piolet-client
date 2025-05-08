@@ -49,7 +49,7 @@ type ProjectFormData = z.infer<typeof projectSchema>;
 export default function EditProjectPage() {
   const { id } = useParams();
   const router = useRouter();
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state) => state.currentUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamMembers, setTeamMembers] = useState<Array<{
     _id: string; name: string; role: string; email: string 

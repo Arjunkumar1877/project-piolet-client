@@ -41,7 +41,7 @@ export default function ProjectDetailsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { data: projectDetails } = useGetProjectsDetails({ projectId: id as string });
   const router = useRouter();
-  const user = useAuthStore((state) => state.user)
+  const user = useAuthStore((state) => state.currentUser)
   const project: ProjectDetails = projectDetails as ProjectDetails;
   const [teamMembers, setTeamMembers] = useState<Array<{
     _id: string; name: string; role: string; email: string

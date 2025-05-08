@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/store/useAuthStore";
 import { FaProjectDiagram, FaTasks, FaTimes, FaUserPlus } from "react-icons/fa";
 import { RiDashboardLine } from "react-icons/ri";
@@ -14,11 +14,13 @@ import { useAddMembers } from "../api/mutations";
 import { MemberFormData, memberSchema } from "../form/form";
 import { AnimatePresence, motion } from "framer-motion";
 import { PiMicrosoftTeamsLogoBold } from "react-icons/pi";
+import { logout } from "../lib/firebase";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const user = useAuthStore((state) => state.user);
-  const clearAuth = useAuthStore((state) => state.logout);
+  const router = useRouter();
+  const user = useAuthStore((state) => state.currentUser);
+  const authStore = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -41,12 +43,12 @@ export default function Navbar() {
       }
       const res = await addMember.mutateAsync({ ...data, userId: user._id });
 
-      if(res.saved){
-        toast.success(res.message)
-      }else{
-        toast.error(res.message)
+      if (res.saved) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
       }
-       
+
       setShowAddMember(false);
       reset();
     } catch {
@@ -55,9 +57,16 @@ export default function Navbar() {
   };
   const isActive = (path: string) => pathname === path;
 
-  const handleLogout = () => {
-    clearAuth();
-    setIsMobileMenuOpen(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      authStore.actions.userLoggedOut();
+      setIsMobileMenuOpen(false);
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Failed to logout. Please try again.");
+    }
   };
 
   const handleLinkClick = () => {
@@ -157,23 +166,23 @@ export default function Navbar() {
           {/* Right side - Auth navigation */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             {user ? (
-         <Link href='/profile'>
-              <div className="flex items-center space-x-4">
-                <div className="text-gray-300 flex items-center">
-                  <span className="h-8 w-8 rounded-full bg-[#0f717b] flex items-center justify-center text-white font-medium">
-                    {user.name.charAt(0).toUpperCase()}
-                  </span>
-                  <span className="ml-2">{user.name}</span>
+              <Link href="/profile">
+                <div className="flex items-center space-x-4">
+                  <div className="text-gray-300 flex items-center">
+                    <span className="h-8 w-8 rounded-full bg-[#0f717b] flex items-center justify-center text-white font-medium">
+                      {user.name.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="ml-2">{user.name}</span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-[#1a1a1a] hover:text-white transition-colors duration-200 flex items-center space-x-2"
+                  >
+                    <BiLogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-[#1a1a1a] hover:text-white transition-colors duration-200 flex items-center space-x-2"
-                >
-                  <BiLogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
-         </Link>
+              </Link>
             ) : (
               <div className="flex items-center space-x-4">
                 <Link

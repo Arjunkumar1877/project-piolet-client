@@ -5,6 +5,7 @@ import { Project } from "../types/project";
 import { CreateTaskDto } from "../types/tasks";
 import { useAuthStore } from "@/src/store/useAuthStore";
 import { toast } from "react-hot-toast";
+import { loginWithEmailAndPassword } from '../lib/firebase';
 
 export function useSignup() {
   const qc = useQueryClient();
@@ -36,14 +37,22 @@ export function useLogin() {
       email: string;
       password: string;
     }) => {
-      const userCredential = await api.post("/auth/login", {
-        email,
-        password,
+      // First, authenticate with Firebase
+      const user = await loginWithEmailAndPassword(email, password);
+      
+      // Get the Firebase ID token
+      const token = await user.getIdToken();
+      
+      // Send the token to your backend for verification
+      const response = await api.post("/auth/verify-token", {
+        token
       });
-      return userCredential.data;
+      
+      return response.data;
     },
     onSuccess: (data) => {
       console.log("Login successful", data);
+
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -209,19 +218,25 @@ export function useDeleteTask() {
 
 export function useUpdateProfile() {
   const qc = useQueryClient();
-  const setUser = useAuthStore((state: { setUser: (user: { _id: string; name: string; email: string } | null) => void }) => state.setUser);
+  const setUser = useAuthStore().actions.loggedInUserReceived;
 
   return useMutation({
-    mutationFn: async (data: {
-      name: string;
-      email: string;
+    mutationFn: async (args: {
+   user: {
+    name: string;
+    email: string;
+   },
+   firebaseId: string
     }) => {
-      const res = await api.put("/users/profile", data);
+      const { user, firebaseId } = args;
+
+      const res = await api.put(`/users/${firebaseId}`, user);
       return res.data;
     },
     onSuccess: (data) => {
-      setUser(data.user);
-      qc.invalidateQueries({ queryKey: ["user"] });
+      setUser(data);
+      console.log(data)
+      qc.invalidateQueries({ queryKey: ["user-details"] });
       toast.success("Profile updated successfully!");
     },
     onError: (error) => {

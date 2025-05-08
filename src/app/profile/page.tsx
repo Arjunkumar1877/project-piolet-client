@@ -4,8 +4,7 @@ import { useAuthStore } from '@/src/store/useAuthStore'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import {  useState } from 'react'
 import { useUpdateProfile } from '@/src/api/mutations'
 import { FaEdit } from 'react-icons/fa'
 
@@ -17,8 +16,7 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>
 
 export default function ProfilePage() {
-  const user = useAuthStore((state) => state.user)
-  const router = useRouter()
+  const user = useAuthStore((state) => state.currentUser)
   const updateProfile = useUpdateProfile()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
@@ -29,25 +27,20 @@ export default function ProfilePage() {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
+      name: user?.name,
+      email: user?.email,
     },
   })
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-    }
-  }, [user, router])
-
   const onSubmit = async (data: ProfileFormData) => {
-    await updateProfile.mutateAsync(data)
+   const res = await updateProfile.mutateAsync({
+      user: data,
+      firebaseId: user?.firebaseId || ''
+    })
+    console.log(res)
     setIsEditModalOpen(false)
   }
 
-  if (!user) {
-    return null
-  }
 
   return (
     <div className="min-h-screen bg-[#121212] py-12">
@@ -67,12 +60,12 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-sm font-medium text-gray-400">Name</h2>
-              <p className="mt-1 text-lg text-white">{user.name}</p>
+              <p className="mt-1 text-lg text-white">{user?.name}</p>
             </div>
 
             <div>
               <h2 className="text-sm font-medium text-gray-400">Email</h2>
-              <p className="mt-1 text-lg text-white">{user.email}</p>
+              <p className="mt-1 text-lg text-white">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -108,6 +101,7 @@ export default function ProfilePage() {
                   type="email"
                   id="email"
                   {...register('email')}
+                  disabled
                   className="mt-1 block w-full rounded-md bg-[#2a2a2a] border border-[#3a3a3a] text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0f717b] focus:border-transparent"
                 />
                 {errors.email && (

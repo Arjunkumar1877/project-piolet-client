@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { useAuthStore } from '@/src/store/useAuthStore'
 import toast from 'react-hot-toast'
 import { useLogin } from '@/src/api/mutations'
-import { useEffect, useState } from 'react'
+import {  useState } from 'react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { useRouter } from 'next/navigation'
 
@@ -19,17 +19,10 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const setUser = useAuthStore((state) => state.setUser)
-  const setAccessToken = useAuthStore((state) => state.setAccessToken)
+  const setUser = useAuthStore().actions.loggedInUserReceived
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const router = useRouter()
-  const user = useAuthStore((state)=> state.user);
 
-  useEffect(()=>{
-    if(user){
-      router.push('/dashboard')
-    }
-  },[router, user])
   const {
     register,
     handleSubmit,
@@ -52,9 +45,8 @@ export default function LoginPage() {
         setError('root', { message: res.message })
       return toast.error(res.message)
      }
-     setUser(res.user)
-        setAccessToken(res.accessToken)
     toast.success(res.message)
+    setUser(res.user)
         router.push('/dashboard')
   }
 
