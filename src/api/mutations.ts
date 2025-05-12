@@ -245,3 +245,32 @@ export function useUpdateProfile() {
     },
   });
 }
+
+
+
+
+
+export function verifyOtp() {
+
+  return useMutation({
+    mutationFn: async (args: {
+   email: string
+   otp: string
+    }) => {
+
+      const res = await api.post(`/auth/verify-otp`, args);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      console.log(data)
+      toast.success("Profile updated successfully!");
+    },
+    onError: (error) => {
+      console.error("Profile update error:", error);
+      toast.error("Failed to update profile");
+    },
+  });
+}
+
+
+

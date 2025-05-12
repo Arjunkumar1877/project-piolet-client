@@ -1,41 +1,45 @@
-'use client'
+"use client";
 
-import { useForm } from 'react-hook-form'
-import Link from 'next/link'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useAuthStore } from '@/src/store/useAuthStore'
-import toast from 'react-hot-toast'
-import { useSignup } from '@/src/api/mutations'
-import { useEffect, useState } from 'react'
+import { useForm } from "react-hook-form";
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useAuthStore } from "@/src/store/useAuthStore";
+import toast from "react-hot-toast";
+import { useSignup } from "@/src/api/mutations";
+import { useEffect, useState } from "react";
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
-import { useRouter } from 'next/navigation'
-import React from 'react'
+import { useRouter } from "next/navigation";
+import React from "react";
 
-const signupSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const signupSchema = z
+  .object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Password must be at least 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
-type SignupFormData = z.infer<typeof signupSchema>
-
+type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
-  const router = useRouter()
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
+  const router = useRouter();
   const user = useAuthStore((state) => state.currentUser);
 
   useEffect(() => {
     if (user) {
-      router.push('/dashboard')
+      router.push("/dashboard");
     }
-  }, [router, user])
+  }, [router, user]);
   const {
     register,
     handleSubmit,
@@ -44,14 +48,14 @@ export default function SignupPage() {
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
-  })
+  });
 
-  const signupMutation = useSignup()
+  const signupMutation = useSignup();
 
   const onSubmit = async (data: SignupFormData) => {
     const res = await signupMutation.mutateAsync({
@@ -59,24 +63,26 @@ export default function SignupPage() {
       email: data.email,
       password: data.password,
     });
-     console.log(res)
+    console.log(res);
     if (!res.signedUp) {
-      setError('root', { message: res.message })
-      return toast.error(res.message)
+      setError("root", { message: res.message });
+      return toast.error(res.message);
     }
-    toast.success(res.message)
-    router.push('/verify')
-  }
+    toast.success(res.message);
+    router.push("/verify");
+  };
 
   const handleShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    setShowPassword(!showPassword)
-  }
+    e.preventDefault();
+    setShowPassword(!showPassword);
+  };
 
-  const handleShowConfirmPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    setShowConfirmPassword(!showConfirmPassword)
-  }
+  const handleShowConfirmPassword = (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
@@ -101,12 +107,14 @@ export default function SignupPage() {
               <input
                 id="name"
                 type="text"
-                {...register('name')}
+                {...register("name")}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#0f717b] bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm rounded-t-md"
                 placeholder="Full Name"
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
+                <p className="mt-1 text-sm text-red-400">
+                  {errors.name.message}
+                </p>
               )}
             </div>
             <div>
@@ -116,80 +124,86 @@ export default function SignupPage() {
               <input
                 id="email"
                 type="email"
-                {...register('email')}
+                {...register("email")}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#0f717b] bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-400">
+                  {errors.email.message}
+                </p>
               )}
             </div>
-            <div className='relative'>
+            <div className="relative">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
               <input
                 id="password"
-                type={showPassword ? 'text' : 'password'}
-                {...register('password')}
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#0f717b] bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
-              {
-                showPassword ? (
-                  <button
-                    type="button"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleShowPassword(e)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                  >
-                    <FaRegEye className="w-4 h-4 text-[#0f717b]" />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleShowPassword(e)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                  >
-                    <FaRegEyeSlash className="w-4 h-4 text-[#0f717b]" />
-                  </button>
-                )
-              }
+              {showPassword ? (
+                <button
+                  type="button"
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    handleShowPassword(e)
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <FaRegEye className="w-4 h-4 text-[#0f717b]" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    handleShowPassword(e)
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <FaRegEyeSlash className="w-4 h-4 text-[#0f717b]" />
+                </button>
+              )}
               {errors.password && (
                 <p className="mt-1 text-sm text-red-400">
                   {errors.password.message}
                 </p>
               )}
             </div>
-            <div className='relative'>
+            <div className="relative">
               <label htmlFor="confirmPassword" className="sr-only">
                 Confirm Password
               </label>
               <input
                 id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                {...register('confirmPassword')}
+                type={showConfirmPassword ? "text" : "password"}
+                {...register("confirmPassword")}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#0f717b] bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-[#0f717b] focus:border-[#0f8a96] focus:z-10 sm:text-sm rounded-b-md"
                 placeholder="Confirm Password"
               />
-              {
-                showConfirmPassword ? (
-                  <button
-                    type="button"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleShowConfirmPassword(e)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                  >
-                    <FaRegEye className="w-4 h-4 text-[#0f717b]" />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleShowConfirmPassword(e)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                  >
-                    <FaRegEyeSlash className="w-4 h-4 text-[#0f717b]" />
-                  </button>
-                )
-              }
+              {showConfirmPassword ? (
+                <button
+                  type="button"
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    handleShowConfirmPassword(e)
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <FaRegEye className="w-4 h-4 text-[#0f717b]" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    handleShowConfirmPassword(e)
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <FaRegEyeSlash className="w-4 h-4 text-[#0f717b]" />
+                </button>
+              )}
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-400">
                   {errors.confirmPassword.message}
@@ -205,8 +219,8 @@ export default function SignupPage() {
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0f717b] hover:bg-[#0f8a96] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0f717b] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-[0_0_10px_rgba(15,113,123,0.3)]"
             >
               {isSubmitting || signupMutation.isPending
-                ? 'Creating account...'
-                : 'Sign up'}
+                ? "Creating account..."
+                : "Sign up"}
             </button>
           </div>
 
@@ -221,5 +235,5 @@ export default function SignupPage() {
         </form>
       </div>
     </div>
-  )
-} 
+  );
+}

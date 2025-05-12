@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { verifyOtp } from '@/src/api/mutations';
 
 const Verify = () => {
     const router = useRouter();
@@ -9,7 +10,8 @@ const Verify = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
+    const params = useParams()
+    const { email } = params;
     useEffect(() => {
         inputRefs.current = inputRefs.current.slice(0, 6);
         // Focus the first input on mount
@@ -117,7 +119,7 @@ const Verify = () => {
             focusNextInput(index);
         }
     };
-
+  const verify = verifyOtp()
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -127,7 +129,12 @@ const Verify = () => {
             const otpString = otp.join('');
             // TODO: Add your OTP verification API call here
             // const response = await verifyOtp(otpString);
+          const res = verify.mutateAsync({
+            email: email as string,
+            otp: 'KUAHLI'
+          })
             
+          console.log(res)
             // For now, just simulate a successful verification
             await new Promise(resolve => setTimeout(resolve, 1000));
             router.push('/dashboard');
