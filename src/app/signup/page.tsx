@@ -59,13 +59,13 @@ export default function SignupPage() {
       email: data.email,
       password: data.password,
     });
-
-    if (!res.user) {
+     console.log(res)
+    if (!res.signedUp) {
       setError('root', { message: res.message })
       return toast.error(res.message)
     }
     toast.success(res.message)
-    router.push('/login')
+    router.push('/verify')
   }
 
   const handleShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {

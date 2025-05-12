@@ -52,7 +52,7 @@ export default function EditProjectPage() {
   const user = useAuthStore((state) => state.currentUser);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamMembers, setTeamMembers] = useState<Array<{
-    _id: string; name: string; role: string; email: string 
+    _id: string; name: string; role: string; email: string
   }>>([]);
   const [selectedMember, setSelectedMember] = useState<string>('');
 
@@ -89,7 +89,7 @@ export default function EditProjectPage() {
     if (projectDetails) {
       const formattedStartDate = projectDetails.startDate ? format(new Date(projectDetails.startDate), 'yyyy-MM-dd') : '';
       const formattedEndDate = projectDetails.endDate ? format(new Date(projectDetails.endDate), 'yyyy-MM-dd') : '';
-      
+
       reset({
         projectName: projectDetails.projectName,
         description: projectDetails.description,
@@ -143,10 +143,10 @@ export default function EditProjectPage() {
         endDate: new Date(data.endDate),
         teamMembers: teamMembers.map(member => member._id)
       };
-      
+
       const result = await editProject.mutateAsync(transformedData);
       console.log('API response:', result);
-      
+
       toast.success('Project updated successfully!');
       router.push('/projects');
     } catch (error) {
