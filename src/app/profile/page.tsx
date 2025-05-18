@@ -4,7 +4,7 @@ import { useAuthStore } from '@/src/store/useAuthStore'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import {  useState } from 'react'
+import { useState } from 'react'
 import { useUpdateProfile } from '@/src/api/mutations'
 import { FaEdit } from 'react-icons/fa'
 
@@ -33,7 +33,7 @@ export default function ProfilePage() {
   })
 
   const onSubmit = async (data: ProfileFormData) => {
-   const res = await updateProfile.mutateAsync({
+    const res = await updateProfile.mutateAsync({
       user: data,
       firebaseId: user?.firebaseId || ''
     })
@@ -76,7 +76,7 @@ export default function ProfilePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-[#1a1a1a] rounded-lg shadow-lg p-8 max-w-md w-full">
             <h2 className="text-2xl font-bold text-white mb-6">Edit Profile</h2>
-            
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300">
