@@ -58,6 +58,7 @@ export default function SignupPage() {
   const signupMutation = useSignup();
 
   const onSubmit = async (data: SignupFormData) => {
+   try {
     const res = await signupMutation.mutateAsync({
       name: data.name,
       email: data.email,
@@ -70,6 +71,9 @@ export default function SignupPage() {
     }
     toast.success(res.message);
     router.push("/verify");
+   } catch (error) {
+    console.log(error)
+   }
   };
 
   const handleShowPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
