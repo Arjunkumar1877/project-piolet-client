@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { verifyOtp } from "@/src/api/mutations";
+import { useVerifyOtp } from "@/src/api/mutations";
 
 const Verify = () => {
   const router = useRouter();
@@ -131,7 +131,7 @@ const Verify = () => {
       focusNextInput(index);
     }
   };
-  const verify = verifyOtp();
+  const verify = useVerifyOtp();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -146,7 +146,7 @@ const Verify = () => {
 
       console.log(res);
       router.push("/login");
-    } catch (err) {
+    } catch {
       setError("Invalid OTP. Please try again.");
     } finally {
       setIsLoading(false);
@@ -160,7 +160,7 @@ const Verify = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setError("");
       setOtp(["", "", "", "", "", ""]);
-    } catch (err) {
+    } catch {
       setError("Failed to resend OTP. Please try again.");
     } finally {
       setIsLoading(false);
@@ -176,7 +176,7 @@ const Verify = () => {
             Verify your email
           </h2>
           <p className="mt-2 text-center text-sm text-gray-400">
-            We've sent a 6-digit code to your email
+            We have sent a 6-digit code to your email
           </p>
         </div>
 
@@ -257,7 +257,7 @@ const Verify = () => {
               disabled={isLoading}
               className="text-sm text-[#0f8a96] hover:text-[#0f717b] disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors duration-200"
             >
-              Didn't receive the code? Resend
+              Did not receive the code? Resend
             </button>
           </div>
         </form>

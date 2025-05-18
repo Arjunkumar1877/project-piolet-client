@@ -250,7 +250,7 @@ export function useUpdateProfile() {
 
 
 
-export function verifyOtp() {
+export function useVerifyOtp() {
 
   return useMutation({
     mutationFn: async (args: {
