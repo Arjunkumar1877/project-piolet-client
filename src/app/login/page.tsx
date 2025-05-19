@@ -6,13 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuthStore } from '@/src/store/useAuthStore'
 import toast from 'react-hot-toast'
-import { useLogin } from '@/src/api/mutations'
+import { useGoogleAuth, useLogin } from '@/src/api/mutations'
 import { useState } from 'react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter } from 'next/navigation'
 import { signInWithGoogle } from '@/src/lib/firebase'
-import api from '@/src/api/axios'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -51,6 +50,7 @@ export default function LoginPage() {
      }
     toast.success(res.message)
     setUser(res.user)
+    
         router.push('/dashboard')
   }
 
@@ -59,24 +59,26 @@ export default function LoginPage() {
     setShowPassword(!showPassword)
   }
 
+  const googleAuth = useGoogleAuth()
+
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true)
       const user = await signInWithGoogle()
-      const token = await user.getIdToken()
       
-      // Send the token to your backend for verification
-      const response = await api.post("/auth/verify-token", {
-        token
+      const response = await googleAuth.mutateAsync({
+        email: user.email as string,
+        name: user.displayName as string,
+        password: user.email as string
       })
-      
-      if (!response.data.user) {
-        toast.error(response.data.message)
+
+      if (!response.signedUp) {
+        toast.error(response.message)
         return
       }
       
-      toast.success(response.data.message)
-      setUser(response.data.user)
+      toast.success(response.message)
+      setUser(response.user)
       router.push('/dashboard')
     } catch (error) {
       console.error('Google sign-in error:', error)
