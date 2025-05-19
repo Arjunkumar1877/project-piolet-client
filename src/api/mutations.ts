@@ -5,7 +5,7 @@ import { Project } from "../types/project";
 import { CreateTaskDto } from "../types/tasks";
 import { useAuthStore } from "@/src/store/useAuthStore";
 import { toast } from "react-hot-toast";
-import { loginWithEmailAndPassword } from '../lib/firebase';
+import { loginWithEmailAndPassword } from "../lib/firebase";
 
 export function useSignup() {
   const qc = useQueryClient();
@@ -39,20 +39,19 @@ export function useLogin() {
     }) => {
       // First, authenticate with Firebase
       const user = await loginWithEmailAndPassword(email, password);
-      
+
       // Get the Firebase ID token
       const token = await user.getIdToken();
-      
+
       // Send the token to your backend for verification
       const response = await api.post("/auth/verify-token", {
-        token
+        token,
       });
-      
+
       return response.data;
     },
     onSuccess: (data) => {
       console.log("Login successful", data);
-
     },
     onError: (error: Error) => {
       console.error("Login failed:", error.message);
@@ -222,11 +221,11 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationFn: async (args: {
-   user: {
-    name: string;
-    email: string;
-   },
-   firebaseId: string
+      user: {
+        name: string;
+        email: string;
+      };
+      firebaseId: string;
     }) => {
       const { user, firebaseId } = args;
 
@@ -235,7 +234,7 @@ export function useUpdateProfile() {
     },
     onSuccess: (data) => {
       setUser(data);
-      console.log(data)
+      console.log(data);
       qc.invalidateQueries({ queryKey: ["user-details"] });
       toast.success("Profile updated successfully!");
     },
@@ -246,23 +245,14 @@ export function useUpdateProfile() {
   });
 }
 
-
-
-
-
 export function useVerifyOtp() {
-
   return useMutation({
-    mutationFn: async (args: {
-   email: string
-   otp: string
-    }) => {
-
+    mutationFn: async (args: { email: string; otp: string }) => {
       const res = await api.post(`/auth/verify-otp`, args);
       return res.data;
     },
     onSuccess: (data) => {
-      console.log(data)
+      console.log(data);
       toast.success("Profile updated successfully!");
     },
     onError: (error) => {
@@ -273,4 +263,23 @@ export function useVerifyOtp() {
 }
 
 
-
+export function useGoogleAuth() {
+  return useMutation({
+    mutationFn: async (data: {
+      email: string;
+      password: string;
+      name: string;
+    }) => {
+      const res = await api.post(`/auth/google-auth`, data);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("Signup successfully!");
+    },
+    onError: (error) => {
+      console.error("Profile update error:", error);
+      toast.error("Failed to update profile");
+    },
+  });
+}

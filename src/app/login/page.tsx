@@ -6,10 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuthStore } from '@/src/store/useAuthStore'
 import toast from 'react-hot-toast'
-import { useLogin } from '@/src/api/mutations'
-import {  useState } from 'react'
+import { useGoogleAuth, useLogin } from '@/src/api/mutations'
+import { useState } from 'react'
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { useRouter } from 'next/navigation'
+import { signInWithGoogle } from '@/src/lib/firebase'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -22,6 +24,7 @@ export default function LoginPage() {
   const setUser = useAuthStore().actions.loggedInUserReceived
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const router = useRouter()
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
   const {
     register,
@@ -47,6 +50,7 @@ export default function LoginPage() {
      }
     toast.success(res.message)
     setUser(res.user)
+    
         router.push('/dashboard')
   }
 
@@ -55,6 +59,34 @@ export default function LoginPage() {
     setShowPassword(!showPassword)
   }
 
+  const googleAuth = useGoogleAuth()
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsGoogleLoading(true)
+      const user = await signInWithGoogle()
+      
+      const response = await googleAuth.mutateAsync({
+        email: user.email as string,
+        name: user.displayName as string,
+        password: user.email as string
+      })
+
+      if (!response.signedUp) {
+        toast.error(response.message)
+        return
+      }
+      
+      toast.success(response.message)
+      setUser(response.user)
+      router.push('/dashboard')
+    } catch (error) {
+      console.error('Google sign-in error:', error)
+      toast.error('Failed to sign in with Google')
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
@@ -129,7 +161,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div>
+          <div className="space-y-4">
             <button
               type="submit"
               disabled={isSubmitting || loginMutation.isPending}
@@ -138,6 +170,25 @@ export default function LoginPage() {
               {isSubmitting || loginMutation.isPending
                 ? 'Signing in...'
                 : 'Sign in'}
+            </button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-600"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-[#121212] text-gray-400">Or continue with</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isGoogleLoading}
+              className="w-full flex items-center justify-center gap-3 px-4 py-2 border border-gray-600 rounded-md text-sm font-medium text-white bg-[#1a1a1a] hover:bg-[#2a2a2a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0f717b] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+            >
+              <FcGoogle className="w-5 h-5" />
+              {isGoogleLoading ? 'Signing in...' : 'Sign in with Google'}
             </button>
           </div>
 
